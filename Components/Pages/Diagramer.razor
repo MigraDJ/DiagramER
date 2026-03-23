@@ -4,6 +4,7 @@
 @using System.Text.Json.Serialization
 @using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Web
+@inject IJSRuntime JSRuntime
 
 <div class="diagramer-container">
     <!-- Left Panel with Tools -->
@@ -15,7 +16,7 @@
                 <span class="icon">➕</span> Add Table
             </button>
 
-            <div class="drag-item" draggable="true" @ondragstart="OnDragStartTable">
+            <div class="drag-item" draggable="true" @ondragstart="OnDragStartTable" @ondragend="OnDragEnd" data-drag-type="table">
                 <span class="icon">📋</span> Drag Table
             </div>
         </div>
@@ -23,7 +24,7 @@
         <!-- Relations Tools Section -->
         <div class="panel-section">
             <h3>Relations</h3>
-            <div class="drag-item" draggable="true" @ondragstart="OnDragStartRelation">
+            <div class="drag-item" draggable="true" @ondragstart="OnDragStartRelation" @ondragend="OnDragEnd" data-drag-type="relation">
                 <span class="icon">🔗</span> Drag Relation
             </div>
         </div>
@@ -40,8 +41,6 @@
 
     <!-- Main Canvas Area -->
     <div class="canvas-area" 
-         @ondrop="OnCanvasDrop" 
-         @ondragover="OnCanvasDragOver"
          @onmousemove="OnCanvasMouseMove"
          @onmouseup="OnCanvasMouseUp"
          @onmouseleave="OnCanvasMouseUp">
@@ -241,6 +240,24 @@
     private double ResizeStartWidth = 0;
     private double ResizeStartHeight = 0;
 
+    private IJSObjectReference? jsModule;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/diagramer.js");
+                await jsModule.InvokeVoidAsync("initDragDrop", DotNetObjectReference.Create(this));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error initializing drag-drop: {ex.Message}");
+            }
+        }
+    }
+
     protected override void OnInitialized()
     {
         UpdateJsonOutput();
@@ -260,14 +277,12 @@
 
     private void OnDragStartTable(DragEventArgs args)
     {
-        DraggedItemType = "table";
-        args.DataTransfer!.EffectAllowed = "copy";
+        // Handled by JavaScript now
     }
 
     private void OnDragStartRelation(DragEventArgs args)
     {
-        DraggedItemType = "relation";
-        args.DataTransfer!.EffectAllowed = "copy";
+        // Handled by JavaScript now
     }
 
     private void OnDragStartCellRelation(DragEventArgs args, string tableId, int rowIndex)
@@ -314,20 +329,9 @@
         ResizingTable = null;
     }
 
-    private void OnCanvasDrop(DragEventArgs args)
+    private void OnDragEnd(DragEventArgs args)
     {
-        if (DraggedItemType == "table")
-        {
-            var newTable = new TableModel
-            {
-                Name = $"Table_{Tables.Count + 1}",
-                X = args.ClientX - 100,
-                Y = args.ClientY - 50
-            };
-            Tables.Add(newTable);
-            UpdateJsonOutput();
-            DraggedItemType = "";
-        }
+        DraggedItemType = "";
     }
 
     private void OnTableMouseDown(TableModel table, MouseEventArgs args)
@@ -480,9 +484,41 @@
         JsonOutput = JsonSerializer.Serialize(schema, options);
     }
 
-    private void CopyJsonToClipboard()
+    [JSInvokable]
+    public async Task OnDragDropTable(double x, double y)
     {
-        // This would be handled by JavaScript interop in a real implementation
+        var newTable = new TableModel
+        {
+            Name = $"Table_{Tables.Count + 1}",
+            X = x - 100,
+            Y = y - 50
+        };
+        Tables.Add(newTable);
+        UpdateJsonOutput();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task CopyJsonToClipboard()
+    {
+        try
+        {
+            if (jsModule != null)
+            {
+                bool success = await jsModule.InvokeAsync<bool>("copyToClipboard", JsonOutput);
+                if (success)
+                {
+                    await jsModule.InvokeVoidAsync("showNotification", "JSON copied to clipboard!");
+                }
+                else
+                {
+                    await jsModule.InvokeVoidAsync("showNotification", "Failed to copy to clipboard", 3000);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error copying to clipboard: {ex.Message}");
+        }
     }
 }
 
