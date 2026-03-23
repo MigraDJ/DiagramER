@@ -22,7 +22,7 @@
         </div>
 
         <!-- Relations Tools Section -->
-        <div class="panel-section">
+        <div class="panel-section" hidden="hidden">
             <h3>Relations</h3>
             <div class="drag-item" draggable="true" @ondragstart="OnDragStartRelation" @ondragend="OnDragEnd" data-drag-type="relation">
                 <span class="icon">🔗</span> Drag Relation
@@ -35,9 +35,23 @@
             <div class="json-output">
                 <pre>@JsonOutput</pre>
             </div>
-            <button class="btn btn-secondary btn-sm" @onclick="CopyJsonToClipboard">Copy JSON</button>
-            <button class="btn btn-secondary btn-sm" @onclick="DownloadJsonFile">Download JSON</button>
-            <button class="btn btn-secondary btn-sm" @onclick="TriggerFileUpload">Load JSON</button>
+            <button class="btn btn-secondary btn-sm" @onclick="CopyJsonToClipboard">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-fill" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M10 1.5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5zm-5 0A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5v1A1.5 1.5 0 0 1 9.5 4h-3A1.5 1.5 0 0 1 5 2.5zm-2 0h1v1A2.5 2.5 0 0 0 6.5 5h3A2.5 2.5 0 0 0 12 2.5v-1h1a2 2 0 0 1 2 2V14a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V3.5a2 2 0 0 1 2-2" />
+                </svg> Copy
+            </button>
+            <button class="btn btn-primary btn-sm" @onclick="DownloadJsonFile">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5" />
+                    <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z" />
+                </svg> Download
+            </button>
+            <button class="btn btn-primary btn-sm" @onclick="TriggerFileUpload">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-upload" viewBox="0 0 16 16">
+                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5" />
+                    <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z" />
+                </svg> Load
+            </button>
             <input type="file" id="jsonFileInput" accept=".json" style="display: none;" @ref="fileInput" @onchange="HandleFileUpload" />
         </div>
     </div>
@@ -64,7 +78,7 @@
                                 <input type="text" 
                                        class="table-title-input" 
                                        @bind="table.Name"
-                                       @onblur="() => EditingTableId = null"
+                                       @onblur="() => { EditingTableId = null; UpdateRelationNames(); UpdateJsonOutput(); }"
                                        @onkeyup="(args) => HandleTitleKeyUp(args, table)"
                                        autofocus />
                             }
@@ -81,10 +95,13 @@
                         <div class="table-columns" style="flex: 1; overflow-y: auto;">
                             <!-- Default Column (Fixed) -->
                             <div class="table-row fixed-row">
+                                <div class="cell cell-handle-header"></div>
                                 <div class="cell" data-column="name">Name</div>
                                 <div class="cell" data-column="datatype">Datatype</div>
+                                <div class="cell" data-column="length">Length</div>
                                 <div class="cell" data-column="default">Default value</div>
                                 <div class="cell" data-column="pk">PK(1,1)</div>
+                                <div class="cell cell-delete-header"></div>
                             </div>
 
                             <!-- Data Rows -->
@@ -92,22 +109,27 @@
                             {
                                 <div class="table-row data-row @(SelectedRowIndex == rowIndex && SelectedTableId == table.Id ? "selected-row" : "")" 
                                      @onclick="() => SelectRow(table.Id, rowIndex)">
+                                    <div class="relation-handle" 
+                                         @ondragstart="args => OnDragStartCellRelation(args, table.Id, rowIndex)"
+                                         @ondragend="OnDragEndCellRelation"
+                                         @ondragover="OnRelationHandleDragOver"
+                                         @ondragover:preventDefault
+                                         @ondrop="args => OnDropRelation(args, table.Id, rowIndex)"
+                                         @ondrop:preventDefault
+                                         draggable="true"
+                                         title="Drag to create relation">●</div>
                                     <div class="cell-wrapper">
                                         <input type="text" 
                                                class="cell-input" 
                                                @bind="row.Name"
                                                @bind:event="oninput"
-                                               @onchange="UpdateJsonOutput"
+                                               @onchange="() => { UpdateRelationNames(); UpdateJsonOutput(); }"
                                                placeholder="Column name" />
-                                        <div class="relation-handle" 
-                                             @ondragstart="args => OnDragStartCellRelation(args, table.Id, rowIndex)"
-                                             draggable="true"
-                                             title="Drag to create relation">●</div>
                                     </div>
                                     <select class="cell-input cell-select" 
                                             value="@row.DataType"
                                             @onchange="(ChangeEventArgs e) => HandleDataTypeChange(e, row)">
-                                        <option value="">-- Select DataType --</option>
+                                        <option value=""> --- </option>
                                         <option value="bigint">bigint</option>
                                         <option value="int">int</option>
                                         <option value="smallint">smallint</option>
@@ -144,6 +166,13 @@
                                         <option value="geometry">geometry</option>
                                         <option value="geography">geography</option>
                                     </select>
+                                    <input type="number" 
+                                           class="cell-input" 
+                                           @bind="row.Length"
+                                           @bind:event="oninput"
+                                           @onchange="UpdateJsonOutput"
+                                           placeholder="Length"
+                                           min="0" />
                                     <input type="text" 
                                            class="cell-input" 
                                            @bind="row.DefaultValue"
@@ -153,7 +182,7 @@
                                     <select class="cell-input cell-select" 
                                             value="@row.PrimaryKey"
                                             @onchange="(ChangeEventArgs e) => HandlePrimaryKeyChange(e, row)">
-                                        <option value="">-- Select --</option>
+                                        <option value=""> --- </option>
                                         <option value="No">No</option>
                                         <option value="Yes">Yes</option>
                                     </select>
@@ -187,20 +216,64 @@
             {
                 var fromTable = Tables.FirstOrDefault(t => t.Id == relation.FromTableId);
                 var toTable = Tables.FirstOrDefault(t => t.Id == relation.ToTableId);
+                var isSelected = SelectedRelationId == relation.Id;
 
                 @if (fromTable != null && toTable != null)
                 {
-                    var fromX = fromTable.X + 200;
-                    var fromY = fromTable.Y + 100 + (relation.FromRowIndex * 30);
-                    var toX = toTable.X + 200;
-                    var toY = toTable.Y + 100 + (relation.ToRowIndex * 30);
+                    var pathPoints = ComputeRelationPath(relation);
+                    @if (pathPoints.Count >= 2)
+                    {
+                        var pointsStr = string.Join(" ", pathPoints.Select(p => FormattableString.Invariant($"{p.X},{p.Y}")));
+                        var relId = relation.Id;
+                        var midSegIdx = pathPoints.Count / 2;
+                        var labelX = (pathPoints[midSegIdx - 1].X + pathPoints[midSegIdx].X) / 2;
+                        var labelY = (pathPoints[midSegIdx - 1].Y + pathPoints[midSegIdx].Y) / 2;
+                        var startPt = pathPoints[0];
+                        var endPt = pathPoints[pathPoints.Count - 1];
 
-                    <line x1="@fromX" y1="@fromY" x2="@toX" y2="@toY" class="relation-line" />
-                    <circle cx="@fromX" cy="@fromY" r="4" class="relation-point" />
-                    <circle cx="@toX" cy="@toY" r="4" class="relation-point" />
-                    <g>
-                        <text x="@((fromX + toX) / 2)" y="@((fromY + toY) / 2 - 5)" class="relation-label">@relation.Name</text>
-                    </g>
+                        <polyline points="@pointsStr" class="relation-line-hit"
+                                  @onclick="() => SelectRelation(relId)" />
+                        <polyline points="@pointsStr"
+                                  class="relation-line @(isSelected ? "relation-line-selected" : "")" />
+                        <circle cx="@startPt.X" cy="@startPt.Y" r="4" class="relation-point" />
+                        <circle cx="@endPt.X" cy="@endPt.Y" r="4" class="relation-point" />
+                        @if (EditingRelationId == relId)
+                        {
+                            var inputWidth = Math.Max(160, relation.Name.Length * 8 + 20);
+                            <foreignObject x="@(labelX - inputWidth / 2)" y="@(labelY - 24)" width="@inputWidth" height="28">
+                                <input type="text" class="relation-name-input"
+                                       @bind="relation.Name"
+                                       @bind:event="oninput"
+                                       @onblur="() => FinishEditingRelationName(relId)"
+                                       @onkeyup="(e) => HandleRelationNameKeyUp(e, relId)"
+                                       autofocus />
+                            </foreignObject>
+                        }
+                        else
+                        {
+                            <g class="relation-label @(isSelected ? "relation-label-selected" : "")"
+                               @onclick="() => SelectRelation(relId)"
+                               @ondblclick="() => StartEditingRelationName(relId)">
+                                <text x="@labelX" y="@(labelY - 8)">@relation.Name</text>
+                            </g>
+                        }
+                        @if (isSelected)
+                        {
+                            @if (pathPoints.Count == 4)
+                            {
+                                var wpX = pathPoints[1].X;
+                                var wpY = (pathPoints[1].Y + pathPoints[2].Y) / 2;
+                                <circle cx="@wpX" cy="@wpY" r="6" class="waypoint-handle"
+                                        @onmousedown="(e) => OnWaypointMouseDown(e, relId)" />
+                            }
+                            <g class="relation-delete-btn" @onclick="() => RemoveRelation(relId)">
+                                <circle cx="@(labelX + 8)" cy="@(labelY - 22)" r="10" class="relation-delete-circle" />
+                                <g class="relation-delete-text">
+                                    <text x="@(labelX + 8)" y="@(labelY - 18)">✕</text>
+                                </g>
+                            </g>
+                        }
+                    }
                 }
             }
         </svg>
@@ -217,6 +290,20 @@
             </svg>
         }
     </div>
+
+    @if (ShowConfirmDialog)
+    {
+        <div class="confirm-overlay" @onclick="CancelDelete">
+            <div class="confirm-dialog" @onclick:stopPropagation="true">
+                <div class="confirm-header">@ConfirmDialogTitle</div>
+                <div class="confirm-body">@ConfirmDialogMessage</div>
+                <div class="confirm-footer">
+                    <button class="confirm-btn confirm-btn-cancel" @onclick="CancelDelete">Cancel</button>
+                    <button class="confirm-btn confirm-btn-delete" @onclick="ConfirmDelete">Delete</button>
+                </div>
+            </div>
+        </div>
+    }
 </div>
 
 @code {
@@ -226,7 +313,7 @@
         public string Name { get; set; } = "New Table";
         public double X { get; set; } = 50;
         public double Y { get; set; } = 50;
-        public double Width { get; set; } = 280;
+        public double Width { get; set; } = 400;
         public double Height { get; set; } = 400;
         public List<ColumnModel> Rows { get; set; } = new();
     }
@@ -235,6 +322,7 @@
     {
         public string Name { get; set; } = "";
         public string DataType { get; set; } = "";
+        public int? Length { get; set; }
         public string DefaultValue { get; set; } = "";
         public string PrimaryKey { get; set; } = "";
     }
@@ -249,6 +337,8 @@
         public int ToRowIndex { get; set; } = 0;
         public string ToColumn { get; set; } = "name";
         public string Name { get; set; } = "New Relation";
+        public bool HasCustomName { get; set; } = false;
+        public double? ManualRouteX { get; set; }
     }
 
     private class DrawingRelationModel
@@ -272,12 +362,23 @@
     private string JsonOutput = "{}";
     private int SelectedRowIndex = -1;
     private string SelectedTableId = "";
+    private string? SelectedRelationId = null;
+    private string? EditingRelationId = null;
+    private bool _relationClickedThisFrame = false;
+    private string? DraggingWaypointRelationId = null;
+    private double WaypointDragOffsetX = 0;
     private TableModel? ResizingTable = null;
     private double ResizeStartX = 0;
     private double ResizeStartY = 0;
     private double ResizeStartWidth = 0;
     private double ResizeStartHeight = 0;
     private ElementReference fileInput;
+
+    // Confirmation dialog state
+    private bool ShowConfirmDialog = false;
+    private string ConfirmDialogTitle = "";
+    private string ConfirmDialogMessage = "";
+    private Action? ConfirmDialogAction = null;
 
     private IJSObjectReference? jsModule;
 
@@ -337,6 +438,76 @@
         };
     }
 
+    private void OnDragEndCellRelation(DragEventArgs args)
+    {
+        DrawingRelation = null;
+    }
+
+    private void OnRelationHandleDragOver(DragEventArgs args)
+    {
+        // Allow drop on relation handles
+    }
+
+    private async Task OnDropRelation(DragEventArgs args, string tableId, int rowIndex)
+    {
+        if (DrawingRelation == null) return;
+
+        // Prevent dropping on the same row of the same table
+        if (DrawingRelation.FromTableId == tableId && DrawingRelation.FromRowIndex == rowIndex)
+        {
+            DrawingRelation = null;
+            return;
+        }
+
+        var fromTable = Tables.FirstOrDefault(t => t.Id == DrawingRelation.FromTableId);
+        var toTable = Tables.FirstOrDefault(t => t.Id == tableId);
+
+        if (fromTable == null || toTable == null)
+        {
+            DrawingRelation = null;
+            return;
+        }
+
+        var fromRow = fromTable.Rows.ElementAtOrDefault(DrawingRelation.FromRowIndex);
+        var toRow = toTable.Rows.ElementAtOrDefault(rowIndex);
+
+        if (fromRow == null || toRow == null)
+        {
+            DrawingRelation = null;
+            return;
+        }
+
+        // Validate that datatypes match
+        if (!string.Equals(fromRow.DataType, toRow.DataType, StringComparison.OrdinalIgnoreCase)
+            || string.IsNullOrEmpty(fromRow.DataType)
+            || string.IsNullOrEmpty(toRow.DataType))
+        {
+            DrawingRelation = null;
+            if (jsModule != null)
+            {
+                await jsModule.InvokeVoidAsync("showErrorNotification",
+                    "The datatypes of the rows are different, please make sure the datatype of both rows matches.");
+            }
+            return;
+        }
+
+        // Create relation with format [Origin_Table]_[Origin_Cell]_[Destination_Table]_[Destination_Cell]_FK
+        var relationName = $"{fromTable.Name}_{fromRow.Name}_{toTable.Name}_{toRow.Name}_FK";
+
+        var relation = new RelationModel
+        {
+            FromTableId = DrawingRelation.FromTableId,
+            FromRowIndex = DrawingRelation.FromRowIndex,
+            ToTableId = tableId,
+            ToRowIndex = rowIndex,
+            Name = relationName
+        };
+
+        Relations.Add(relation);
+        DrawingRelation = null;
+        UpdateJsonOutput();
+    }
+
     private void OnCanvasDragOver(DragEventArgs args)
     {
         args.DataTransfer!.DropEffect = "copy";
@@ -360,12 +531,31 @@
             ResizingTable.Height = Math.Max(300, ResizeStartHeight + deltaY);
             StateHasChanged();
         }
+
+        if (DraggingWaypointRelationId != null)
+        {
+            var relation = Relations.FirstOrDefault(r => r.Id == DraggingWaypointRelationId);
+            if (relation != null)
+            {
+                relation.ManualRouteX = args.ClientX - WaypointDragOffsetX;
+            }
+            StateHasChanged();
+        }
     }
 
     private void OnCanvasMouseUp()
     {
         DraggingTable = null;
         ResizingTable = null;
+        DraggingWaypointRelationId = null;
+        if (_relationClickedThisFrame)
+        {
+            _relationClickedThisFrame = false;
+        }
+        else
+        {
+            SelectedRelationId = null;
+        }
     }
 
     private void OnDragEnd(DragEventArgs args)
@@ -419,13 +609,49 @@
         var table = Tables.FirstOrDefault(t => t.Id == tableId);
         if (table != null && rowIndex >= 0 && rowIndex < table.Rows.Count)
         {
-            table.Rows.RemoveAt(rowIndex);
-            if (SelectedTableId == tableId && SelectedRowIndex == rowIndex)
+            var rowName = string.IsNullOrWhiteSpace(table.Rows[rowIndex].Name) ? $"Row {rowIndex + 1}" : table.Rows[rowIndex].Name;
+            var affectedRelations = Relations.Where(r =>
+                (r.FromTableId == tableId && r.FromRowIndex == rowIndex) ||
+                (r.ToTableId == tableId && r.ToRowIndex == rowIndex)).ToList();
+
+            var message = $"Are you sure you want to delete the column \"{rowName}\" from table \"{table.Name}\"?";
+            if (affectedRelations.Count > 0)
             {
-                SelectedRowIndex = -1;
-                SelectedTableId = "";
+                var relationNames = string.Join(", ", affectedRelations.Select(r => r.Name));
+                message += $"\n\nThis will also delete {affectedRelations.Count} relation(s): {relationNames}";
             }
-            UpdateJsonOutput();
+
+            ShowConfirmDialog = true;
+            ConfirmDialogTitle = "Delete Column";
+            ConfirmDialogMessage = message;
+            ConfirmDialogAction = () =>
+            {
+                // Remove relations that reference this row
+                Relations.RemoveAll(r =>
+                    (r.FromTableId == tableId && r.FromRowIndex == rowIndex) ||
+                    (r.ToTableId == tableId && r.ToRowIndex == rowIndex));
+
+                // Adjust row indices for relations referencing rows after the deleted one
+                foreach (var relation in Relations)
+                {
+                    if (relation.FromTableId == tableId && relation.FromRowIndex > rowIndex)
+                        relation.FromRowIndex--;
+                    if (relation.ToTableId == tableId && relation.ToRowIndex > rowIndex)
+                        relation.ToRowIndex--;
+                }
+
+                table.Rows.RemoveAt(rowIndex);
+                if (SelectedTableId == tableId && SelectedRowIndex == rowIndex)
+                {
+                    SelectedRowIndex = -1;
+                    SelectedTableId = "";
+                }
+                if (SelectedRelationId != null && !Relations.Any(r => r.Id == SelectedRelationId))
+                    SelectedRelationId = null;
+
+                UpdateRelationNames();
+                UpdateJsonOutput();
+            };
         }
     }
 
@@ -499,6 +725,7 @@
         if (args.Key == "Enter")
         {
             EditingTableId = null;
+            UpdateRelationNames();
             UpdateJsonOutput();
         }
     }
@@ -517,6 +744,7 @@
                 {
                     name = r.Name,
                     dataType = r.DataType,
+                    length = r.Length,
                     defaultValue = r.DefaultValue,
                     primaryKey = r.PrimaryKey
                 }).ToList()
@@ -525,10 +753,12 @@
             {
                 id = r.Id,
                 name = r.Name,
+                hasCustomName = r.HasCustomName ? true : (bool?)null,
                 fromTable = r.FromTableId,
                 fromColumn = r.FromRowIndex,
                 toTable = r.ToTableId,
-                toColumn = r.ToRowIndex
+                toColumn = r.ToRowIndex,
+                manualRouteX = r.ManualRouteX
             }).ToList()
         };
 
@@ -539,6 +769,165 @@
         };
 
         JsonOutput = JsonSerializer.Serialize(schema, options);
+    }
+
+    private void UpdateRelationNames()
+    {
+        foreach (var relation in Relations)
+        {
+            if (relation.HasCustomName) continue;
+
+            var fromTable = Tables.FirstOrDefault(t => t.Id == relation.FromTableId);
+            var toTable = Tables.FirstOrDefault(t => t.Id == relation.ToTableId);
+            if (fromTable == null || toTable == null) continue;
+
+            var fromRow = fromTable.Rows.ElementAtOrDefault(relation.FromRowIndex);
+            var toRow = toTable.Rows.ElementAtOrDefault(relation.ToRowIndex);
+            if (fromRow == null || toRow == null) continue;
+
+            relation.Name = $"{fromTable.Name}_{fromRow.Name}_{toTable.Name}_{toRow.Name}_FK";
+        }
+    }
+
+    private void SelectRelation(string relationId)
+    {
+        SelectedRelationId = SelectedRelationId == relationId ? null : relationId;
+        _relationClickedThisFrame = true;
+    }
+
+    private void StartEditingRelationName(string relationId)
+    {
+        EditingRelationId = relationId;
+        _relationClickedThisFrame = true;
+    }
+
+    private void FinishEditingRelationName(string relationId)
+    {
+        var relation = Relations.FirstOrDefault(r => r.Id == relationId);
+        if (relation != null)
+        {
+            relation.HasCustomName = true;
+        }
+        EditingRelationId = null;
+        UpdateJsonOutput();
+    }
+
+    private void HandleRelationNameKeyUp(KeyboardEventArgs args, string relationId)
+    {
+        if (args.Key == "Enter")
+        {
+            FinishEditingRelationName(relationId);
+        }
+        else if (args.Key == "Escape")
+        {
+            EditingRelationId = null;
+        }
+    }
+
+    private void RemoveRelation(string relationId)
+    {
+        var relation = Relations.FirstOrDefault(r => r.Id == relationId);
+        if (relation != null)
+        {
+            ShowConfirmDialog = true;
+            ConfirmDialogTitle = "Delete Relation";
+            ConfirmDialogMessage = $"Are you sure you want to delete the relation \"{relation.Name}\"?";
+            ConfirmDialogAction = () =>
+            {
+                Relations.RemoveAll(r => r.Id == relationId);
+                SelectedRelationId = null;
+                UpdateJsonOutput();
+            };
+            _relationClickedThisFrame = true;
+        }
+    }
+
+    private void ConfirmDelete()
+    {
+        ConfirmDialogAction?.Invoke();
+        ShowConfirmDialog = false;
+        ConfirmDialogAction = null;
+    }
+
+    private void CancelDelete()
+    {
+        ShowConfirmDialog = false;
+        ConfirmDialogAction = null;
+    }
+
+    // Layout constants for connection point calculation
+    private const double TableHeaderHeight = 50;
+    private const double FixedRowHeight = 40;
+    private const double DataRowHeight = 40;
+    private const double RouteMargin = 30;
+
+    private (double X, double Y) GetConnectionPoint(TableModel table, int rowIndex)
+    {
+        double x = table.X;
+        double y = table.Y + TableHeaderHeight + FixedRowHeight + (rowIndex * DataRowHeight) + (DataRowHeight / 2);
+        return (x, y);
+    }
+
+    private List<(double X, double Y)> ComputeRelationPath(RelationModel relation)
+    {
+        var fromTable = Tables.FirstOrDefault(t => t.Id == relation.FromTableId);
+        var toTable = Tables.FirstOrDefault(t => t.Id == relation.ToTableId);
+        if (fromTable == null || toTable == null) return new();
+
+        var (fromX, fromY) = GetConnectionPoint(fromTable, relation.FromRowIndex);
+        var (toX, toY) = GetConnectionPoint(toTable, relation.ToRowIndex);
+
+        double routeX;
+        if (relation.ManualRouteX.HasValue)
+        {
+            routeX = relation.ManualRouteX.Value;
+        }
+        else
+        {
+            // Auto-compute: go left of both tables with margin
+            routeX = Math.Min(fromX, toX) - RouteMargin;
+
+            // Push further left if any table blocks the vertical segment
+            double minY = Math.Min(fromY, toY);
+            double maxY = Math.Max(fromY, toY);
+
+            foreach (var table in Tables)
+            {
+                double tLeft = table.X;
+                double tRight = table.X + table.Width;
+                double tTop = table.Y;
+                double tBottom = table.Y + table.Height;
+
+                if (routeX >= tLeft && routeX <= tRight &&
+                    tTop < maxY && tBottom > minY)
+                {
+                    routeX = Math.Min(routeX, tLeft - RouteMargin);
+                }
+            }
+        }
+
+        return new List<(double X, double Y)>
+        {
+            (fromX, fromY),
+            (routeX, fromY),
+            (routeX, toY),
+            (toX, toY)
+        };
+    }
+
+    private void OnWaypointMouseDown(MouseEventArgs args, string relationId)
+    {
+        var relation = Relations.FirstOrDefault(r => r.Id == relationId);
+        if (relation != null)
+        {
+            var path = ComputeRelationPath(relation);
+            if (path.Count >= 3)
+            {
+                WaypointDragOffsetX = args.ClientX - path[1].X;
+            }
+            DraggingWaypointRelationId = relationId;
+            _relationClickedThisFrame = true;
+        }
     }
 
     [JSInvokable]
@@ -733,6 +1122,9 @@
                             if (columnElement.TryGetProperty("dataType", out var dataTypeElement))
                                 column.DataType = dataTypeElement.GetString() ?? "";
 
+                            if (columnElement.TryGetProperty("length", out var lengthElement) && lengthElement.ValueKind == JsonValueKind.Number)
+                                column.Length = lengthElement.GetInt32();
+
                             if (columnElement.TryGetProperty("defaultValue", out var defaultElement))
                                 column.DefaultValue = defaultElement.GetString() ?? "";
 
@@ -773,6 +1165,12 @@
 
                         if (relationElement.TryGetProperty("toColumn", out var toColElement))
                             relation.ToRowIndex = toColElement.GetInt32();
+
+                        if (relationElement.TryGetProperty("hasCustomName", out var customNameElement) && customNameElement.ValueKind == JsonValueKind.True)
+                            relation.HasCustomName = true;
+
+                        if (relationElement.TryGetProperty("manualRouteX", out var routeXElement) && routeXElement.ValueKind == JsonValueKind.Number)
+                            relation.ManualRouteX = routeXElement.GetDouble();
 
                         // Only add relation if both tables exist
                         if (Tables.Any(t => t.Id == relation.FromTableId) && 
@@ -844,6 +1242,7 @@
         width: 300px;
         background: var(--bs-secondary-bg);
         border-right: 1px solid var(--bs-border-color);
+        border-radius:7px;
         display: flex;
         flex-direction: column;
         overflow-y: auto;
@@ -981,7 +1380,7 @@
     .table-card {
         background: var(--bs-body-bg);
         border: 2px solid #0078d4;
-        border-radius: 4px;
+        border-radius: 7px;
         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         min-width: 280px;
         overflow: hidden;
@@ -1049,7 +1448,8 @@
     }
 
     .table-row {
-        display: flex;
+        display: grid;
+        grid-template-columns: 20px 2fr 2fr 1fr 1.5fr 1fr 30px;
         border-bottom: 1px solid var(--bs-border-color);
         background: var(--bs-body-bg);
         transition: background 0.2s;
@@ -1075,28 +1475,36 @@
     }
 
     .cell {
-        flex: 1;
         padding: 12px 8px;
         border-right: 1px solid var(--bs-border-color);
         font-size: 13px;
         text-align: left;
         min-height: 20px;
         color: var(--bs-body-color);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .cell:last-child {
         border-right: none;
     }
 
+    .cell-delete-header {
+        padding: 0;
+        border-right: none;
+    }
+
     .cell-wrapper {
-        flex: 1;
         display: flex;
         align-items: center;
         position: relative;
+        min-width: 0;
     }
 
     .cell-input {
-        flex: 1;
+        width: 100%;
+        min-width: 0;
         padding: 10px 8px;
         border: none;
         border-right: 1px solid var(--bs-border-color);
@@ -1104,6 +1512,7 @@
         background: transparent;
         font-family: inherit;
         color: var(--bs-body-color);
+        box-sizing: border-box;
     }
 
     .cell-input:focus {
@@ -1112,7 +1521,8 @@
     }
 
     .cell-select {
-        flex: 1;
+        width: 100%;
+        min-width: 0;
         padding: 8px 6px;
         border: none;
         border-right: 1px solid var(--bs-border-color);
@@ -1121,6 +1531,7 @@
         font-family: inherit;
         cursor: pointer;
         color: var(--bs-body-color);
+        box-sizing: border-box;
     }
 
     .cell-select:focus {
@@ -1135,28 +1546,28 @@
     }
 
     .relation-handle {
-        position: absolute;
-        right: -12px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 16px;
-        height: 16px;
-        background: var(--bs-primary);
-        border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
+        width: 16px;
+        height: 16px;
+        margin: auto;
+        background: var(--bs-primary);
+        border-radius: 50%;
         color: white;
         font-size: 10px;
-        cursor: pointer;
-        z-index: 10;
+        cursor: grab;
         transition: all 0.2s;
     }
 
     .relation-handle:hover {
-        transform: translateY(-50%) scale(1.3);
-        background: var(--bs-primary);
+        transform: scale(1.3);
         opacity: 0.8;
+    }
+
+    .cell-handle-header {
+        padding: 0;
+        border-right: 1px solid var(--bs-border-color);
     }
 
     .delete-row-btn {
@@ -1167,8 +1578,10 @@
         border-radius: 2px;
         cursor: pointer;
         font-size: 12px;
-        margin: 0 8px;
+        margin: 0;
         transition: all 0.2s;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .delete-row-btn:hover {
@@ -1231,14 +1644,31 @@
         z-index: 5;
     }
 
-    .drawing-svg {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: 4;
+    .relations-svg .relation-line-hit,
+    .relations-svg .relation-label,
+    .relations-svg .relation-delete-btn,
+    .relations-svg .waypoint-handle,
+    .relations-svg foreignObject {
+        pointer-events: all;
+    }
+
+    .waypoint-handle {
+        fill: #ff9800;
+        stroke: white;
+        stroke-width: 2;
+        cursor: ew-resize;
+    }
+
+    .waypoint-handle:hover {
+        fill: #f57c00;
+        r: 8;
+    }
+
+    .relation-line-hit {
+        stroke: transparent;
+        stroke-width: 14;
+        fill: none;
+        cursor: pointer;
     }
 
     .relation-line {
@@ -1246,6 +1676,12 @@
         stroke-width: 2;
         fill: none;
         marker-end: url(#arrowhead);
+        pointer-events: none;
+    }
+
+    .relation-line-selected {
+        stroke: #ff9800;
+        stroke-width: 3;
     }
 
     .drawing-line {
@@ -1264,8 +1700,55 @@
         fill: var(--bs-body-color);
         font-weight: 500;
         text-anchor: middle;
+        cursor: pointer;
+    }
+
+    .relation-label-selected {
+        fill: #ff9800;
+        font-weight: 700;
+    }
+
+    .relation-name-input {
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+        padding: 2px 6px;
+        font-size: 12px;
+        font-weight: 500;
+        font-family: inherit;
+        border: 2px solid #ff9800;
+        border-radius: 3px;
         background: var(--bs-body-bg);
-        padding: 2px 4px;
+        color: var(--bs-body-color);
+        text-align: center;
+        outline: none;
+    }
+
+    .relation-delete-circle {
+        fill: #dc3545;
+        cursor: pointer;
+    }
+
+    .relation-delete-circle:hover {
+        fill: #bb2d3b;
+    }
+
+    .relation-delete-text {
+        fill: white;
+        font-size: 12px;
+        text-anchor: middle;
+        dominant-baseline: central;
+        cursor: pointer;
+    }
+
+    .drawing-svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 4;
     }
 
     .icon {
@@ -1323,5 +1806,92 @@
 
     .json-output::-webkit-scrollbar-thumb:hover {
         background: var(--bs-body-color);
+    }
+
+    /* Chrome, Safari, Edge, Opera */
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* Firefox */
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+
+    .confirm-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+    }
+
+    .confirm-dialog {
+        background: var(--bs-body-bg);
+        color: var(--bs-body-color);
+        border: 1px solid var(--bs-border-color);
+        border-radius: 8px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        min-width: 360px;
+        max-width: 440px;
+        overflow: hidden;
+    }
+
+    .confirm-header {
+        background: #dc3545;
+        color: white;
+        padding: 14px 20px;
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    .confirm-body {
+        padding: 20px;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .confirm-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        padding: 12px 20px;
+        border-top: 1px solid var(--bs-border-color);
+    }
+
+    .confirm-btn {
+        padding: 8px 20px;
+        border: none;
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .confirm-btn-cancel {
+        background: var(--bs-secondary-bg);
+        color: var(--bs-body-color);
+        border: 1px solid var(--bs-border-color);
+    }
+
+    .confirm-btn-cancel:hover {
+        background: var(--bs-tertiary-bg);
+    }
+
+    .confirm-btn-delete {
+        background: #dc3545;
+        color: white;
+    }
+
+    .confirm-btn-delete:hover {
+        background: #bb2d3b;
     }
 </style>

@@ -145,6 +145,52 @@ export function showNotification(message, duration = 2000) {
     }, duration);
 }
 
+export function showErrorNotification(message, duration = 4000) {
+    const notification = document.createElement('div');
+    notification.textContent = message;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background-color: #dc3545;
+        color: white;
+        padding: 16px;
+        border-radius: 4px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        z-index: 10000;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", sans-serif;
+        font-size: 14px;
+        animation: slideIn 0.3s ease-in-out;
+    `;
+
+    document.body.appendChild(notification);
+
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(400px); opacity: 0; }
+        }
+    `;
+    if (!document.head.querySelector('style[data-diagramer]')) {
+        style.setAttribute('data-diagramer', 'true');
+        document.head.appendChild(style);
+    }
+
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease-in-out';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                document.body.removeChild(notification);
+            }
+        }, 300);
+    }, duration);
+}
+
 export function downloadFile(byteArray, fileName, mimeType) {
     // Convert byte array to blob
     const blob = new Blob([new Uint8Array(byteArray)], { type: mimeType });
