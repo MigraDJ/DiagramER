@@ -36,6 +36,9 @@
                 <pre>@JsonOutput</pre>
             </div>
             <button class="btn btn-secondary btn-sm" @onclick="CopyJsonToClipboard">Copy JSON</button>
+            <button class="btn btn-secondary btn-sm" @onclick="DownloadJsonFile">Download JSON</button>
+            <button class="btn btn-secondary btn-sm" @onclick="TriggerFileUpload">Load JSON</button>
+            <input type="file" id="jsonFileInput" accept=".json" style="display: none;" @ref="fileInput" @onchange="HandleFileUpload" />
         </div>
     </div>
 
@@ -101,24 +104,59 @@
                                              draggable="true"
                                              title="Drag to create relation">●</div>
                                     </div>
-                                    <input type="text" 
-                                           class="cell-input" 
-                                           @bind="row.DataType"
-                                           @bind:event="oninput"
-                                           @onchange="UpdateJsonOutput"
-                                           placeholder="DataType" />
+                                    <select class="cell-input cell-select" 
+                                            value="@row.DataType"
+                                            @onchange="(ChangeEventArgs e) => HandleDataTypeChange(e, row)">
+                                        <option value="">-- Select DataType --</option>
+                                        <option value="bigint">bigint</option>
+                                        <option value="int">int</option>
+                                        <option value="smallint">smallint</option>
+                                        <option value="tinyint">tinyint</option>
+                                        <option value="decimal">decimal</option>
+                                        <option value="numeric">numeric</option>
+                                        <option value="float">float</option>
+                                        <option value="real">real</option>
+                                        <option value="money">money</option>
+                                        <option value="smallmoney">smallmoney</option>
+                                        <option value="bit">bit</option>
+                                        <option value="char">char</option>
+                                        <option value="varchar">varchar</option>
+                                        <option value="varchar(max)">varchar(max)</option>
+                                        <option value="nchar">nchar</option>
+                                        <option value="nvarchar">nvarchar</option>
+                                        <option value="nvarchar(max)">nvarchar(max)</option>
+                                        <option value="text">text</option>
+                                        <option value="ntext">ntext</option>
+                                        <option value="date">date</option>
+                                        <option value="time">time</option>
+                                        <option value="datetime">datetime</option>
+                                        <option value="datetime2">datetime2</option>
+                                        <option value="datetimeoffset">datetimeoffset</option>
+                                        <option value="smalldatetime">smalldatetime</option>
+                                        <option value="timestamp">timestamp</option>
+                                        <option value="binary">binary</option>
+                                        <option value="varbinary">varbinary</option>
+                                        <option value="varbinary(max)">varbinary(max)</option>
+                                        <option value="image">image</option>
+                                        <option value="uniqueidentifier">uniqueidentifier</option>
+                                        <option value="xml">xml</option>
+                                        <option value="json">json</option>
+                                        <option value="geometry">geometry</option>
+                                        <option value="geography">geography</option>
+                                    </select>
                                     <input type="text" 
                                            class="cell-input" 
                                            @bind="row.DefaultValue"
                                            @bind:event="oninput"
                                            @onchange="UpdateJsonOutput"
                                            placeholder="Default" />
-                                    <input type="text" 
-                                           class="cell-input" 
-                                           @bind="row.PrimaryKey"
-                                           @bind:event="oninput"
-                                           @onchange="UpdateJsonOutput"
-                                           placeholder="PK" />
+                                    <select class="cell-input cell-select" 
+                                            value="@row.PrimaryKey"
+                                            @onchange="(ChangeEventArgs e) => HandlePrimaryKeyChange(e, row)">
+                                        <option value="">-- Select --</option>
+                                        <option value="No">No</option>
+                                        <option value="Yes">Yes</option>
+                                    </select>
                                     <button class="delete-row-btn" @onclick="() => RemoveRow(table.Id, rowIndex)">✕</button>
                                 </div>
                             }
@@ -239,6 +277,7 @@
     private double ResizeStartY = 0;
     private double ResizeStartWidth = 0;
     private double ResizeStartHeight = 0;
+    private ElementReference fileInput;
 
     private IJSObjectReference? jsModule;
 
@@ -404,6 +443,24 @@
         }
     }
 
+    private void HandleDataTypeChange(ChangeEventArgs e, ColumnModel row)
+    {
+        if (e.Value != null)
+        {
+            row.DataType = e.Value.ToString() ?? "";
+            UpdateJsonOutput();
+        }
+    }
+
+    private void HandlePrimaryKeyChange(ChangeEventArgs e, ColumnModel row)
+    {
+        if (e.Value != null)
+        {
+            row.PrimaryKey = e.Value.ToString() ?? "";
+            UpdateJsonOutput();
+        }
+    }
+
     private void MoveRowUp(string tableId)
     {
         var table = Tables.FirstOrDefault(t => t.Id == tableId);
@@ -520,6 +577,258 @@
             Console.WriteLine($"Error copying to clipboard: {ex.Message}");
         }
     }
+
+    private async Task DownloadJsonFile()
+    {
+        try
+        {
+            var fileName = "diagram.json";
+            var bytes = System.Text.Encoding.UTF8.GetBytes(JsonOutput);
+
+            if (jsModule != null)
+            {
+                await jsModule.InvokeVoidAsync("downloadFile", bytes, fileName, "application/json");
+                await jsModule.InvokeVoidAsync("showNotification", "JSON file downloaded!");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error downloading file: {ex.Message}");
+            if (jsModule != null)
+            {
+                await jsModule.InvokeVoidAsync("showNotification", $"Error downloading file: {ex.Message}", 3000);
+            }
+        }
+    }
+
+    private async Task TriggerFileUpload()
+    {
+        try
+        {
+            if (jsModule != null)
+            {
+                await jsModule.InvokeVoidAsync("triggerFileInput");
+            }
+            else
+            {
+                Console.WriteLine("JS module not loaded yet");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error triggering file upload: {ex.Message}");
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
+        }
+    }
+
+    private async Task HandleFileUpload(ChangeEventArgs e)
+    {
+        try
+        {
+            Console.WriteLine("HandleFileUpload called");
+
+            if (jsModule == null)
+            {
+                Console.WriteLine("JS module is null, cannot read file");
+                return;
+            }
+
+            var fileContent = await jsModule.InvokeAsync<string>("readUploadedFile");
+            Console.WriteLine($"File content length: {fileContent?.Length ?? 0}");
+
+            if (!string.IsNullOrEmpty(fileContent))
+            {
+                Console.WriteLine("Loading diagram from JSON");
+                // Validate and load JSON
+                await LoadDiagramFromJson(fileContent);
+            }
+            else
+            {
+                Console.WriteLine("File content is empty");
+                if (jsModule != null)
+                {
+                    await jsModule.InvokeVoidAsync("showNotification", "No file was selected", 2000);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error handling file upload: {ex.Message}");
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
+            if (jsModule != null)
+            {
+                await jsModule.InvokeVoidAsync("showNotification", $"Error loading file: {ex.Message}", 3000);
+            }
+        }
+    }
+
+    private async Task LoadDiagramFromJson(string jsonContent)
+    {
+        try
+        {
+            Console.WriteLine("Starting LoadDiagramFromJson");
+            Console.WriteLine($"JSON content preview: {(jsonContent.Length > 100 ? jsonContent.Substring(0, 100) + "..." : jsonContent)}");
+
+            // Parse and validate JSON structure
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            };
+
+            using (JsonDocument doc = JsonDocument.Parse(jsonContent))
+            {
+                var root = doc.RootElement;
+                Console.WriteLine($"JSON root element kind: {root.ValueKind}");
+
+                // Validate required structure
+                if (!root.TryGetProperty("tables", out var tablesElement) || tablesElement.ValueKind != JsonValueKind.Array)
+                {
+                    throw new InvalidOperationException("Invalid diagram format: missing or invalid 'tables' array");
+                }
+
+                Console.WriteLine($"Found {tablesElement.GetArrayLength()} tables");
+
+                // Clear current diagram
+                Tables.Clear();
+                Relations.Clear();
+
+                // Load tables
+                foreach (var tableElement in tablesElement.EnumerateArray())
+                {
+                    var table = new TableModel();
+
+                    if (tableElement.TryGetProperty("id", out var idElement))
+                        table.Id = idElement.GetString() ?? Guid.NewGuid().ToString();
+
+                    if (tableElement.TryGetProperty("name", out var nameElement))
+                        table.Name = nameElement.GetString() ?? "New Table";
+
+                    if (tableElement.TryGetProperty("position", out var posElement))
+                    {
+                        if (posElement.TryGetProperty("x", out var xElement))
+                            table.X = xElement.GetDouble();
+                        if (posElement.TryGetProperty("y", out var yElement))
+                            table.Y = yElement.GetDouble();
+                    }
+
+                    if (tableElement.TryGetProperty("size", out var sizeElement))
+                    {
+                        if (sizeElement.TryGetProperty("width", out var widthElement))
+                            table.Width = widthElement.GetDouble();
+                        if (sizeElement.TryGetProperty("height", out var heightElement))
+                            table.Height = heightElement.GetDouble();
+                    }
+
+                    // Load columns
+                    if (tableElement.TryGetProperty("columns", out var columnsElement) && columnsElement.ValueKind == JsonValueKind.Array)
+                    {
+                        foreach (var columnElement in columnsElement.EnumerateArray())
+                        {
+                            var column = new ColumnModel();
+
+                            if (columnElement.TryGetProperty("name", out var colNameElement))
+                                column.Name = colNameElement.GetString() ?? "";
+
+                            if (columnElement.TryGetProperty("dataType", out var dataTypeElement))
+                                column.DataType = dataTypeElement.GetString() ?? "";
+
+                            if (columnElement.TryGetProperty("defaultValue", out var defaultElement))
+                                column.DefaultValue = defaultElement.GetString() ?? "";
+
+                            if (columnElement.TryGetProperty("primaryKey", out var pkElement))
+                                column.PrimaryKey = pkElement.GetString() ?? "";
+
+                            table.Rows.Add(column);
+                        }
+                    }
+
+                    Console.WriteLine($"Added table: {table.Name} with {table.Rows.Count} columns");
+                    Tables.Add(table);
+                }
+
+                // Load relations if they exist
+                if (root.TryGetProperty("relations", out var relationsElement) && relationsElement.ValueKind == JsonValueKind.Array)
+                {
+                    Console.WriteLine($"Found {relationsElement.GetArrayLength()} relations");
+
+                    foreach (var relationElement in relationsElement.EnumerateArray())
+                    {
+                        var relation = new RelationModel();
+
+                        if (relationElement.TryGetProperty("id", out var relIdElement))
+                            relation.Id = relIdElement.GetString() ?? Guid.NewGuid().ToString();
+
+                        if (relationElement.TryGetProperty("name", out var relNameElement))
+                            relation.Name = relNameElement.GetString() ?? "New Relation";
+
+                        if (relationElement.TryGetProperty("fromTable", out var fromTableElement))
+                            relation.FromTableId = fromTableElement.GetString() ?? "";
+
+                        if (relationElement.TryGetProperty("fromColumn", out var fromColElement))
+                            relation.FromRowIndex = fromColElement.GetInt32();
+
+                        if (relationElement.TryGetProperty("toTable", out var toTableElement))
+                            relation.ToTableId = toTableElement.GetString() ?? "";
+
+                        if (relationElement.TryGetProperty("toColumn", out var toColElement))
+                            relation.ToRowIndex = toColElement.GetInt32();
+
+                        // Only add relation if both tables exist
+                        if (Tables.Any(t => t.Id == relation.FromTableId) && 
+                            Tables.Any(t => t.Id == relation.ToTableId))
+                        {
+                            Console.WriteLine($"Added relation: {relation.Name}");
+                            Relations.Add(relation);
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Skipping relation {relation.Name}: missing table references");
+                        }
+                    }
+                }
+
+                Console.WriteLine("Updating JSON output");
+                UpdateJsonOutput();
+
+                Console.WriteLine("Triggering state change");
+                await InvokeAsync(StateHasChanged);
+
+                if (jsModule != null)
+                {
+                    await jsModule.InvokeVoidAsync("showNotification", "Diagram loaded successfully!");
+                }
+
+                Console.WriteLine("LoadDiagramFromJson completed successfully");
+            }
+        }
+        catch (JsonException jex)
+        {
+            Console.WriteLine($"JSON parsing error: {jex.Message}");
+            Console.WriteLine($"Stack trace: {jex.StackTrace}");
+            if (jsModule != null)
+            {
+                await jsModule.InvokeVoidAsync("showNotification", $"Invalid JSON format: {jex.Message}", 3000);
+            }
+        }
+        catch (InvalidOperationException iex)
+        {
+            Console.WriteLine($"Validation error: {iex.Message}");
+            if (jsModule != null)
+            {
+                await jsModule.InvokeVoidAsync("showNotification", iex.Message, 3000);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading diagram: {ex.Message}");
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
+            if (jsModule != null)
+            {
+                await jsModule.InvokeVoidAsync("showNotification", $"Error loading diagram: {ex.Message}", 3000);
+            }
+        }
+    }
 }
 
 <style>
@@ -527,22 +836,24 @@
         display: flex;
         height: 100vh;
         width: 100%;
-        background: #f5f5f5;
+        background: var(--bs-body-bg);
+        color: var(--bs-body-color);
     }
 
     .left-panel {
         width: 300px;
-        background: #fff;
-        border-right: 1px solid #ddd;
+        background: var(--bs-secondary-bg);
+        border-right: 1px solid var(--bs-border-color);
         display: flex;
         flex-direction: column;
         overflow-y: auto;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        color: var(--bs-body-color);
     }
 
     .panel-section {
         padding: 15px;
-        border-bottom: 1px solid #eee;
+        border-bottom: 1px solid var(--bs-border-color);
     }
 
     .panel-section h3 {
@@ -550,7 +861,7 @@
         font-size: 14px;
         font-weight: 600;
         text-transform: uppercase;
-        color: #333;
+        color: var(--bs-body-color);
     }
 
     .btn-block {
@@ -561,20 +872,20 @@
 
     .drag-item {
         padding: 12px;
-        background: #f0f0f0;
-        border: 2px dashed #999;
+        background: var(--bs-tertiary-bg);
+        border: 2px dashed var(--bs-border-color);
         border-radius: 4px;
         cursor: move;
         text-align: center;
         font-weight: 500;
-        color: #333;
+        color: var(--bs-body-color);
         transition: all 0.2s;
         margin-bottom: 10px;
     }
 
     .drag-item:hover {
-        background: #e0e0e0;
-        border-color: #666;
+        background: var(--bs-secondary-bg);
+        border-color: var(--bs-body-color);
     }
 
     .drag-item .icon {
@@ -587,16 +898,26 @@
         flex-direction: column;
     }
 
+    .json-section .btn {
+        margin-bottom: 8px;
+        width: 100%;
+    }
+
+    .json-section .btn:last-child {
+        margin-bottom: 0;
+    }
+
     .json-output {
         flex: 1;
-        background: #f9f9f9;
-        border: 1px solid #ddd;
+        background: var(--bs-tertiary-bg);
+        border: 1px solid var(--bs-border-color);
         border-radius: 4px;
         padding: 10px;
         font-size: 11px;
         font-family: 'Courier New', monospace;
         overflow-y: auto;
         margin-bottom: 10px;
+        color: var(--bs-body-color);
     }
 
     .json-output pre {
@@ -615,22 +936,23 @@
     }
 
     .btn-primary {
-        background: #0078d4;
+        background: var(--bs-primary);
         color: white;
     }
 
     .btn-primary:hover {
-        background: #1084d8;
+        background: var(--bs-primary);
+        opacity: 0.9;
     }
 
     .btn-secondary {
-        background: #f3f3f3;
-        color: #333;
-        border: 1px solid #ddd;
+        background: var(--bs-secondary-bg);
+        color: var(--bs-body-color);
+        border: 1px solid var(--bs-border-color);
     }
 
     .btn-secondary:hover {
-        background: #e8e8e8;
+        background: var(--bs-tertiary-bg);
     }
 
     .btn-sm {
@@ -641,12 +963,9 @@
     .canvas-area {
         flex: 1;
         position: relative;
-        background: linear-gradient(45deg, #fafafa 25%, transparent 25%, transparent 75%, #fafafa 75%, #fafafa),
-                    linear-gradient(45deg, #fafafa 25%, transparent 25%, transparent 75%, #fafafa 75%, #fafafa);
-        background-size: 20px 20px;
-        background-position: 0 0, 10px 10px;
-        background-color: #fff;
+        background: var(--bs-body-bg);
         overflow: hidden;
+        color: var(--bs-body-color);
     }
 
     .tables-container {
@@ -660,17 +979,18 @@
     }
 
     .table-card {
-        background: white;
+        background: var(--bs-body-bg);
         border: 2px solid #0078d4;
         border-radius: 4px;
         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         min-width: 280px;
         overflow: hidden;
         position: relative;
+        color: var(--bs-body-color);
     }
 
     .table-header {
-        background: linear-gradient(135deg, #0078d4 0%, #0063b1 100%);
+        background: var(--bs-primary);
         color: white;
         padding: 12px;
         display: flex;
@@ -711,6 +1031,12 @@
         cursor: pointer;
         padding: 0 5px;
         transition: all 0.2s;
+        opacity: 0.8;
+    }
+
+    .close-btn:hover {
+        opacity: 1;
+        transform: scale(1.1);
     }
 
     .close-btn:hover {
@@ -718,24 +1044,25 @@
     }
 
     .table-columns {
-        background: white;
+        background: var(--bs-body-bg);
+        color: var(--bs-body-color);
     }
 
     .table-row {
         display: flex;
-        border-bottom: 1px solid #e0e0e0;
-        background: white;
+        border-bottom: 1px solid var(--bs-border-color);
+        background: var(--bs-body-bg);
         transition: background 0.2s;
     }
 
     .table-row:hover {
-        background: #f9f9f9;
+        background: var(--bs-tertiary-bg);
     }
 
     .fixed-row {
-        background: #f0f0f0;
+        background: var(--bs-secondary-bg);
         font-weight: 600;
-        color: #333;
+        color: var(--bs-body-color);
     }
 
     .data-row {
@@ -743,17 +1070,18 @@
     }
 
     .selected-row {
-        background-color: #e3f2fd !important;
+        background-color: rgba(13, 110, 253, 0.1) !important;
         border-left: 3px solid #0078d4;
     }
 
     .cell {
         flex: 1;
         padding: 12px 8px;
-        border-right: 1px solid #e0e0e0;
+        border-right: 1px solid var(--bs-border-color);
         font-size: 13px;
         text-align: left;
         min-height: 20px;
+        color: var(--bs-body-color);
     }
 
     .cell:last-child {
@@ -771,15 +1099,39 @@
         flex: 1;
         padding: 10px 8px;
         border: none;
-        border-right: 1px solid #e0e0e0;
+        border-right: 1px solid var(--bs-border-color);
         font-size: 13px;
         background: transparent;
         font-family: inherit;
+        color: var(--bs-body-color);
     }
 
     .cell-input:focus {
-        background: #e8f3ff;
+        background: rgba(13, 110, 253, 0.1);
         outline: none;
+    }
+
+    .cell-select {
+        flex: 1;
+        padding: 8px 6px;
+        border: none;
+        border-right: 1px solid var(--bs-border-color);
+        font-size: 13px;
+        background: var(--bs-body-bg);
+        font-family: inherit;
+        cursor: pointer;
+        color: var(--bs-body-color);
+    }
+
+    .cell-select:focus {
+        background: rgba(13, 110, 253, 0.1);
+        outline: none;
+    }
+
+    .cell-select option {
+        color: var(--bs-body-color);
+        background: var(--bs-body-bg);
+        padding: 8px;
     }
 
     .relation-handle {
@@ -789,7 +1141,7 @@
         transform: translateY(-50%);
         width: 16px;
         height: 16px;
-        background: #0078d4;
+        background: var(--bs-primary);
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -803,12 +1155,13 @@
 
     .relation-handle:hover {
         transform: translateY(-50%) scale(1.3);
-        background: #1084d8;
+        background: var(--bs-primary);
+        opacity: 0.8;
     }
 
     .delete-row-btn {
         padding: 4px 8px;
-        background: #ff6b6b;
+        background: #dc3545;
         color: white;
         border: none;
         border-radius: 2px;
@@ -819,47 +1172,48 @@
     }
 
     .delete-row-btn:hover {
-        background: #ff5252;
+        background: #bb2d3b;
     }
 
     .add-row-btn {
         width: 100%;
         padding: 10px;
-        background: #f0f0f0;
-        border: 1px solid #ddd;
-        border-top: 2px solid #0078d4;
+        background: var(--bs-secondary-bg);
+        border: 1px solid var(--bs-border-color);
+        border-top: 2px solid var(--bs-primary);
         cursor: pointer;
         font-weight: 500;
-        color: #0078d4;
+        color: var(--bs-primary);
         transition: all 0.2s;
     }
 
     .add-row-btn:hover {
-        background: #e8f3ff;
+        background: rgba(13, 110, 253, 0.1);
     }
 
     .row-controls {
         display: flex;
         gap: 4px;
         padding: 8px;
-        background: #f9f9f9;
-        border-top: 1px solid #e0e0e0;
+        background: var(--bs-tertiary-bg);
+        border-top: 1px solid var(--bs-border-color);
     }
 
     .order-btn {
         flex: 1;
         padding: 6px;
-        background: white;
-        border: 1px solid #ddd;
+        background: var(--bs-body-bg);
+        border: 1px solid var(--bs-border-color);
         border-radius: 2px;
         cursor: pointer;
         font-size: 14px;
         transition: all 0.2s;
+        color: var(--bs-body-color);
     }
 
     .order-btn:hover:not(:disabled) {
-        background: #e8f3ff;
-        border-color: #0078d4;
+        background: rgba(13, 110, 253, 0.1);
+        border-color: var(--bs-primary);
     }
 
     .order-btn:disabled {
@@ -888,7 +1242,7 @@
     }
 
     .relation-line {
-        stroke: #0078d4;
+        stroke: var(--bs-primary);
         stroke-width: 2;
         fill: none;
         marker-end: url(#arrowhead);
@@ -902,15 +1256,15 @@
     }
 
     .relation-point {
-        fill: #0078d4;
+        fill: var(--bs-primary);
     }
 
     .relation-label {
         font-size: 12px;
-        fill: #0078d4;
+        fill: var(--bs-body-color);
         font-weight: 500;
         text-anchor: middle;
-        background: white;
+        background: var(--bs-body-bg);
         padding: 2px 4px;
     }
 
@@ -925,7 +1279,7 @@
         width: 20px;
         height: 20px;
         cursor: nwse-resize;
-        background: linear-gradient(135deg, transparent 50%, #0078d4 50%);
+        background: linear-gradient(135deg, transparent 50%, var(--bs-primary) 50%);
         border-radius: 0 0 4px 0;
         opacity: 0.5;
         transition: opacity 0.2s;
@@ -933,7 +1287,7 @@
 
     .resize-handle:hover {
         opacity: 1;
-        background: linear-gradient(135deg, transparent 50%, #1084d8 50%);
+        background: linear-gradient(135deg, transparent 50%, var(--bs-primary) 50%);
     }
 
     .left-panel::-webkit-scrollbar {
@@ -941,16 +1295,16 @@
     }
 
     .left-panel::-webkit-scrollbar-track {
-        background: #f1f1f1;
+        background: var(--bs-secondary-bg);
     }
 
     .left-panel::-webkit-scrollbar-thumb {
-        background: #888;
+        background: var(--bs-border-color);
         border-radius: 4px;
     }
 
     .left-panel::-webkit-scrollbar-thumb:hover {
-        background: #555;
+        background: var(--bs-body-color);
     }
 
     .json-output::-webkit-scrollbar {
@@ -958,16 +1312,16 @@
     }
 
     .json-output::-webkit-scrollbar-track {
-        background: #f1f1f1;
+        background: var(--bs-secondary-bg);
         border-radius: 4px;
     }
 
     .json-output::-webkit-scrollbar-thumb {
-        background: #999;
+        background: var(--bs-border-color);
         border-radius: 4px;
     }
 
     .json-output::-webkit-scrollbar-thumb:hover {
-        background: #666;
+        background: var(--bs-body-color);
     }
 </style>

@@ -1,4 +1,5 @@
 using DiagramER.Components;
+using DiagramER.Services;
 
 namespace DiagramER
 {
@@ -11,6 +12,9 @@ namespace DiagramER
             // Add services to the container.
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
+
+            // Add theme service
+            builder.Services.AddScoped<ThemeService>();
 
             var app = builder.Build();
 
