@@ -66,6 +66,12 @@
                     <path d="M1.5 0h11.586a1.5 1.5 0 0 1 1.06.44l1.415 1.414A1.5 1.5 0 0 1 16 2.914V14.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 14.5v-13A1.5 1.5 0 0 1 1.5 0M1 1.5v13a.5.5 0 0 0 .5.5H2v-4.5A1.5 1.5 0 0 1 3.5 9h9a1.5 1.5 0 0 1 1.5 1.5V15h.5a.5.5 0 0 0 .5-.5V2.914a.5.5 0 0 0-.146-.353l-1.415-1.415A.5.5 0 0 0 13.086 1H13v4.5A1.5 1.5 0 0 1 11.5 7h-7A1.5 1.5 0 0 1 3 5.5V1H1.5a.5.5 0 0 0-.5.5m3 4a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5V1H4zM3 15h10v-4.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5z" />
                 </svg> &nbsp; Export Diagram
             </button>
+            <button class="btn btn-primary btn-sm" @onclick="GenerateSqlScript">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-braces-asterisk" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M1.114 8s-1.063-1.497-1.063-2.5C.05 4.55.792 4 1.5 4h.5v1h-.5c-.217 0-.45.15-.45.5 0 .567.69 1.684 1.063 2.2L2.428 8l-.315.3C1.74 8.816 1.05 9.933 1.05 10.5c0 .35.233.5.45.5H2v1h-.5C.792 12 .05 11.45.05 10.5c0-1.003 1.063-2.5 1.063-2.5M14.886 8s1.063-1.497 1.063-2.5c0-.95-.742-1.5-1.45-1.5H14v1h.5c.217 0 .45.15.45.5 0 .567-.69 1.684-1.063 2.2L13.572 8l.315.3c.373.516 1.063 1.633 1.063 2.2 0 .35-.233.5-.45.5H14v1h.5c.708 0 1.45-.55 1.45-1.5 0-1.003-1.063-2.5-1.063-2.5" />
+                    <path d="M7.5 1.018a.5.5 0 0 1 .978 0l.123.62a.5.5 0 0 0 .377.377l.62.123a.5.5 0 0 1 0 .978l-.62.123a.5.5 0 0 0-.377.377l-.123.62a.5.5 0 0 1-.978 0l-.123-.62a.5.5 0 0 0-.377-.377l-.62-.123a.5.5 0 0 1 0-.978l.62-.123a.5.5 0 0 0 .377-.377zM6 8a.5.5 0 0 1 .978 0l.14.707a.5.5 0 0 0 .377.377l.707.14a.5.5 0 0 1 0 .978l-.707.14a.5.5 0 0 0-.377.377l-.14.707a.5.5 0 0 1-.978 0l-.14-.707a.5.5 0 0 0-.377-.377l-.707-.14a.5.5 0 0 1 0-.978l.707-.14a.5.5 0 0 0 .377-.377zm3.5 3.982a.5.5 0 0 1 .978 0l.123.62a.5.5 0 0 0 .377.377l.62.123a.5.5 0 0 1 0 .978l-.62.123a.5.5 0 0 0-.377.377l-.123.62a.5.5 0 0 1-.978 0l-.123-.62a.5.5 0 0 0-.377-.377l-.62-.123a.5.5 0 0 1 0-.978l.62-.123a.5.5 0 0 0 .377-.377z" />
+                </svg> &nbsp; Generate SQL
+            </button>
             <input type="file" id="jsonFileInput" accept=".json" style="display: none;" @ref="fileInput" @onchange="HandleFileUpload" />
         </div>
     </div>
@@ -161,6 +167,7 @@
                                 <div class="table-row data-row @(SelectedRowIndex == rowIndex && SelectedTableId == table.Id ? "selected-row" : "")" 
                                      @onclick="() => SelectRow(table.Id, rowIndex)">
                                     <div class="relation-handle" 
+                                         @onmousedown:stopPropagation="true"
                                          @ondragstart="args => OnDragStartCellRelation(args, table.Id, rowIndex)"
                                          @ondragend="OnDragEndCellRelation"
                                          @ondragover="OnRelationHandleDragOver"
@@ -271,6 +278,11 @@
 
         <!-- SVG for Relations -->
         <svg class="relations-svg">
+            <defs>
+                <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto" markerUnits="strokeWidth">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="var(--bs-primary)" />
+                </marker>
+            </defs>
             @foreach (var relation in Relations)
             {
                 var fromTable = Tables.FirstOrDefault(t => t.Id == relation.FromTableId);
@@ -310,10 +322,9 @@
                         }
                         else
                         {
-                            <g class="relation-label @(isSelected ? "relation-label-selected" : "")"
-                               @onclick="() => SelectRelation(relId)"
+                            <g @onclick="() => SelectRelation(relId)"
                                @ondblclick="() => StartEditingRelationName(relId)">
-                                <text x="@labelX" y="@(labelY - 8)">@relation.Name</text>
+                                <text x="@labelX" y="@(labelY - 8)" class="relation-label @(isSelected ? "relation-label-selected" : "")">@relation.Name</text>
                             </g>
                         }
                         @if (isSelected)
@@ -366,6 +377,24 @@
                 <div class="confirm-footer">
                     <button class="confirm-btn confirm-btn-cancel" @onclick="CancelDelete">Cancel</button>
                     <button class="confirm-btn confirm-btn-delete" @onclick="ConfirmDelete">Delete</button>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (ShowSqlModal)
+    {
+        <div class="confirm-overlay" @onclick="CloseSqlModal">
+            <div class="confirm-dialog sql-dialog" @onclick:stopPropagation="true">
+                <div class="confirm-header sql-header">Generated SQL Script</div>
+                <div class="sql-modal-body">
+                    <div class="sql-output-panel">
+                        <pre>@GeneratedSqlOutput</pre>
+                    </div>
+                </div>
+                <div class="confirm-footer">
+                    <button class="confirm-btn confirm-btn-cancel" @onclick="CloseSqlModal">Close</button>
+                    <button class="confirm-btn sql-copy-btn" @onclick="CopySqlToClipboard">Copy SQL</button>
                 </div>
             </div>
         </div>
@@ -465,6 +494,8 @@
     private string ConfirmDialogTitle = "";
     private string ConfirmDialogMessage = "";
     private Action? ConfirmDialogAction = null;
+    private bool ShowSqlModal = false;
+    private string GeneratedSqlOutput = string.Empty;
     private IJSObjectReference? jsModule;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -526,6 +557,7 @@
 
     private void OnDragStartCellRelation(DragEventArgs args, string tableId, int rowIndex)
     {
+        IsPanningCanvas = false;
         DrawingRelation = new DrawingRelationModel
         {
             FromTableId = tableId,
@@ -539,6 +571,7 @@
 
     private void OnDragEndCellRelation(DragEventArgs args)
     {
+        IsPanningCanvas = false;
         DrawingRelation = null;
     }
 
@@ -549,6 +582,7 @@
 
     private async Task OnDropRelation(DragEventArgs args, string tableId, int rowIndex)
     {
+        IsPanningCanvas = false;
         if (DrawingRelation == null) return;
 
         // Prevent dropping on the same row of the same table
@@ -1041,6 +1075,131 @@
     {
         ShowConfirmDialog = false;
         ConfirmDialogAction = null;
+    }
+
+    private void GenerateSqlScript()
+    {
+        var sqlBuilder = new System.Text.StringBuilder();
+
+        for (int tableIndex = 0; tableIndex < Tables.Count; tableIndex++)
+        {
+            var table = Tables[tableIndex];
+            var primaryKeyColumns = table.Rows.Where(r => string.Equals(r.PrimaryKey, "Yes", StringComparison.OrdinalIgnoreCase)).ToList();
+
+            sqlBuilder.AppendLine($"CREATE TABLE [dbo].[{EscapeSqlIdentifier(table.Name)}] (");
+
+            for (int rowIndex = 0; rowIndex < table.Rows.Count; rowIndex++)
+            {
+                var column = table.Rows[rowIndex];
+                var isLastColumnDefinition = rowIndex == table.Rows.Count - 1 && primaryKeyColumns.Count == 0;
+                var comma = isLastColumnDefinition ? string.Empty : ",";
+
+                sqlBuilder.AppendLine($"    [{EscapeSqlIdentifier(column.Name)}] {GetSqlServerColumnDefinition(column)}{comma}");
+            }
+
+            if (primaryKeyColumns.Count > 0)
+            {
+                var primaryKeyName = $"PK_{table.Name}";
+                var pkColumns = string.Join(", ", primaryKeyColumns.Select(c => $"[{EscapeSqlIdentifier(c.Name)}] ASC"));
+                sqlBuilder.AppendLine($"    CONSTRAINT [{EscapeSqlIdentifier(primaryKeyName)}] PRIMARY KEY CLUSTERED");
+                sqlBuilder.AppendLine("    (");
+                sqlBuilder.AppendLine($"        {pkColumns}");
+                sqlBuilder.AppendLine("    )");
+            }
+
+            sqlBuilder.AppendLine(");");
+
+            if (tableIndex < Tables.Count - 1 || Relations.Count > 0)
+            {
+                sqlBuilder.AppendLine();
+            }
+        }
+
+        for (int relationIndex = 0; relationIndex < Relations.Count; relationIndex++)
+        {
+            var relation = Relations[relationIndex];
+            var fromTable = Tables.FirstOrDefault(t => t.Id == relation.FromTableId);
+            var toTable = Tables.FirstOrDefault(t => t.Id == relation.ToTableId);
+            var fromColumn = fromTable?.Rows.ElementAtOrDefault(relation.FromRowIndex);
+            var toColumn = toTable?.Rows.ElementAtOrDefault(relation.ToRowIndex);
+
+            if (fromTable == null || toTable == null || fromColumn == null || toColumn == null)
+            {
+                continue;
+            }
+
+            sqlBuilder.AppendLine($"ALTER TABLE [dbo].[{EscapeSqlIdentifier(toTable.Name)}]  WITH CHECK ADD  CONSTRAINT [{EscapeSqlIdentifier(relation.Name)}] FOREIGN KEY([{EscapeSqlIdentifier(toColumn.Name)}])");
+            sqlBuilder.AppendLine($"REFERENCES [dbo].[{EscapeSqlIdentifier(fromTable.Name)}] ([{EscapeSqlIdentifier(fromColumn.Name)}]);");
+            sqlBuilder.AppendLine($"ALTER TABLE [dbo].[{EscapeSqlIdentifier(toTable.Name)}] CHECK CONSTRAINT [{EscapeSqlIdentifier(relation.Name)}];");
+
+            if (relationIndex < Relations.Count - 1)
+            {
+                sqlBuilder.AppendLine();
+            }
+        }
+
+        GeneratedSqlOutput = sqlBuilder.ToString().TrimEnd();
+        ShowSqlModal = true;
+    }
+
+    private static string EscapeSqlIdentifier(string? identifier)
+    {
+        return string.IsNullOrWhiteSpace(identifier) ? "Unnamed" : identifier.Replace("]", "]]", StringComparison.Ordinal);
+    }
+
+    private static string GetSqlServerColumnDefinition(ColumnModel column)
+    {
+        var dataType = string.IsNullOrWhiteSpace(column.DataType) ? "nvarchar" : column.DataType.Trim();
+        var normalizedType = dataType.ToLowerInvariant();
+        var typesWithLength = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "char", "varchar", "nchar", "nvarchar", "binary", "varbinary"
+        };
+
+        var typesWithPrecision = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "decimal", "numeric"
+        };
+
+        string sqlType;
+        if (typesWithLength.Contains(normalizedType) && !normalizedType.Contains("max", StringComparison.OrdinalIgnoreCase))
+        {
+            var length = column.Length.GetValueOrDefault(normalizedType.StartsWith("n", StringComparison.OrdinalIgnoreCase) ? 50 : 100);
+            sqlType = $"{dataType}({length})";
+        }
+        else if (typesWithPrecision.Contains(normalizedType))
+        {
+            sqlType = $"{dataType}(18, 2)";
+        }
+        else
+        {
+            sqlType = dataType;
+        }
+        var identity = string.Equals(column.PrimaryKey, "Yes", StringComparison.OrdinalIgnoreCase) && column.DataType.EndsWith("int") ? "IDENTITY(1,1)" 
+            : string.Equals(column.PrimaryKey, "Yes", StringComparison.OrdinalIgnoreCase) ? "IDENTITY" : "";
+        var nullability = string.Equals(column.Null, "Yes", StringComparison.OrdinalIgnoreCase) ? "NULL" : "NOT NULL";
+        return $"{sqlType} {identity} {nullability}";
+    }
+
+    private void CloseSqlModal()
+    {
+        ShowSqlModal = false;
+    }
+
+    private async Task CopySqlToClipboard()
+    {
+        if (jsModule == null)
+            return;
+
+        var success = await jsModule.InvokeAsync<bool>("copyToClipboard", GeneratedSqlOutput);
+        if (success)
+        {
+            await jsModule.InvokeVoidAsync("showNotification", "SQL copied to clipboard!");
+        }
+        else
+        {
+            await jsModule.InvokeVoidAsync("showErrorNotification", "Failed to copy SQL to clipboard.");
+        }
     }
 
     // Layout constants for connection point calculation
@@ -2185,6 +2344,54 @@
         min-width: 360px;
         max-width: 440px;
         overflow: hidden;
+    }
+
+    .sql-dialog {
+        width: min(1100px, 92vw);
+        max-width: min(1100px, 92vw);
+        min-width: min(1100px, 92vw);
+        max-height: 88vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .sql-header {
+        background: linear-gradient(135deg, var(--bs-primary), #6f42c1);
+    }
+
+    .sql-modal-body {
+        padding: 20px;
+        min-height: 0;
+        flex: 1;
+        display: flex;
+    }
+
+    .sql-output-panel {
+        flex: 1;
+        min-height: 0;
+        overflow: auto;
+        background: var(--bs-tertiary-bg);
+        border: 1px solid var(--bs-border-color);
+        border-radius: 8px;
+        padding: 16px;
+        font-family: 'Courier New', Consolas, monospace;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .sql-output-panel pre {
+        margin: 0;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+
+    .sql-copy-btn {
+        background: var(--bs-primary);
+        color: white;
+    }
+
+    .sql-copy-btn:hover {
+        opacity: 0.9;
     }
 
     .confirm-header {
