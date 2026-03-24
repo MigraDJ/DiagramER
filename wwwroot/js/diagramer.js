@@ -291,3 +291,202 @@ export function readUploadedFile() {
         }
     });
 }
+
+async function ensureScriptLoaded(url, globalName) {
+    if (globalName && window[globalName]) {
+        return;
+    }
+
+    await new Promise((resolve, reject) => {
+        const key = globalName || url;
+        const existing = document.querySelector(`script[data-diagramer-lib="${key}"]`);
+
+        if (existing) {
+            if (!globalName || window[globalName]) {
+                resolve();
+                return;
+            }
+
+            existing.addEventListener('load', () => resolve(), { once: true });
+            existing.addEventListener('error', () => reject(new Error(`Failed to load script: ${url}`)), { once: true });
+            return;
+        }
+
+        const script = document.createElement('script');
+        script.src = url;
+        script.async = true;
+        script.dataset.diagramerLib = key;
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error(`Failed to load script: ${url}`));
+        document.head.appendChild(script);
+    });
+}
+
+async function ensureExportLibraries(format) {
+    await ensureScriptLoaded('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js', 'html2canvas');
+
+    if (format === 'pdf') {
+        await ensureScriptLoaded('https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js', 'jspdf');
+    }
+}
+
+function downloadDataUrl(dataUrl, fileName) {
+    const link = document.createElement('a');
+    link.href = dataUrl;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+async function renderDiagramCanvas(elementId) {
+    await ensureExportLibraries('png');
+
+    const surface = document.getElementById(elementId);
+    if (!surface) {
+        throw new Error('Diagram surface not found');
+    }
+
+    const canvasArea = surface.closest('.canvas-area');
+    if (!canvasArea) {
+        throw new Error('Canvas area not found');
+    }
+
+    const zoomControls = canvasArea.querySelector('.zoom-controls');
+    const previousVisibility = zoomControls ? zoomControls.style.visibility : null;
+    if (zoomControls) {
+        zoomControls.style.visibility = 'hidden';
+    }
+
+    const backgroundColor = (getComputedStyle(document.documentElement).getPropertyValue('--bs-body-bg') || '#ffffff').trim() || '#ffffff';
+    try {
+        return await window.html2canvas(canvasArea, {
+            backgroundColor,
+            scale: 2,
+            useCORS: true,
+            width: canvasArea.clientWidth,
+            height: canvasArea.clientHeight
+        });
+    } finally {
+        if (zoomControls) {
+            zoomControls.style.visibility = previousVisibility || '';
+        }
+    }
+}
+
+async function getExportBlob(canvas, format) {
+    if (format === 'png') {
+        return await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    }
+
+    if (format === 'jpg') {
+        const jpgCanvas = document.createElement('canvas');
+        jpgCanvas.width = canvas.width;
+        jpgCanvas.height = canvas.height;
+        const ctx = jpgCanvas.getContext('2d');
+        if (!ctx) {
+            throw new Error('Unable to create JPG export context');
+        }
+
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, jpgCanvas.width, jpgCanvas.height);
+        ctx.drawImage(canvas, 0, 0);
+        return await new Promise(resolve => jpgCanvas.toBlob(resolve, 'image/jpeg', 0.92));
+    }
+
+    if (format === 'pdf') {
+        await ensureExportLibraries('pdf');
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({
+            orientation: canvas.width >= canvas.height ? 'landscape' : 'portrait',
+            unit: 'px',
+            format: [canvas.width, canvas.height]
+        });
+
+        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, canvas.width, canvas.height);
+        return pdf.output('blob');
+    }
+
+    throw new Error(`Unsupported export format: ${format}`);
+}
+
+function getDefaultFileName(format) {
+    if (format === 'pdf') {
+        return 'diagram.pdf';
+    }
+
+    if (format === 'jpg') {
+        return 'diagram.jpg';
+    }
+
+    return 'diagram.png';
+}
+
+function getPickerOptions() {
+    return {
+        suggestedName: 'diagram.png',
+        types: [
+            {
+                description: 'PNG Image',
+                accept: { 'image/png': ['.png'] }
+            },
+            {
+                description: 'JPEG Image',
+                accept: { 'image/jpeg': ['.jpg', '.jpeg'] }
+            },
+            {
+                description: 'PDF Document',
+                accept: { 'application/pdf': ['.pdf'] }
+            }
+        ]
+    };
+}
+
+function inferFormatFromHandle(handle) {
+    const name = (handle.name || '').toLowerCase();
+    if (name.endsWith('.pdf')) {
+        return 'pdf';
+    }
+
+    if (name.endsWith('.jpg') || name.endsWith('.jpeg')) {
+        return 'jpg';
+    }
+
+    return 'png';
+}
+
+export async function exportDiagramWithSavePicker(elementId) {
+    const canvas = await renderDiagramCanvas(elementId);
+
+    if (window.showSaveFilePicker) {
+        const handle = await window.showSaveFilePicker(getPickerOptions());
+        const format = inferFormatFromHandle(handle);
+        const blob = await getExportBlob(canvas, format);
+        if (!blob) {
+            throw new Error('Failed to create export file');
+        }
+
+        const writable = await handle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+        return;
+    }
+
+    const formatInput = window.prompt('Enter export format: png, jpg, or pdf', 'png');
+    if (!formatInput) {
+        return;
+    }
+
+    const format = formatInput.toLowerCase();
+    const blob = await getExportBlob(canvas, format);
+    if (!blob) {
+        throw new Error('Failed to create export file');
+    }
+
+    const url = URL.createObjectURL(blob);
+    try {
+        downloadDataUrl(url, getDefaultFileName(format));
+    } finally {
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+}

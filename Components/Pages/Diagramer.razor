@@ -13,19 +13,27 @@
         <div class="panel-section">
             <h3>Tables</h3>
             <button class="btn btn-primary btn-block" @onclick="AddTableViaButton">
-                <span class="icon">➕</span> Add Table
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
+                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
+                </svg> &nbsp; Add Table
             </button>
-
-            <div class="drag-item" draggable="true" @ondragstart="OnDragStartTable" @ondragend="OnDragEnd" data-drag-type="table">
-                <span class="icon">📋</span> Drag Table
-            </div>
+            <button class="btn btn-secondary btn-block" @onclick="AddTextLabelViaButton">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-input-cursor-text" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M5 2a.5.5 0 0 1 .5-.5c.862 0 1.573.287 2.06.566.174.099.321.198.44.286.119-.088.266-.187.44-.286A4.17 4.17 0 0 1 10.5 1.5a.5.5 0 0 1 0 1c-.638 0-1.177.213-1.564.434a3.5 3.5 0 0 0-.436.294V7.5H9a.5.5 0 0 1 0 1h-.5v4.272c.1.08.248.187.436.294.387.221.926.434 1.564.434a.5.5 0 0 1 0 1 4.17 4.17 0 0 1-2.06-.566A5 5 0 0 1 8 13.65a5 5 0 0 1-.44.285 4.17 4.17 0 0 1-2.06.566.5.5 0 0 1 0-1c.638 0 1.177-.213 1.564-.434.188-.107.335-.214.436-.294V8.5H7a.5.5 0 0 1 0-1h.5V3.228a3.5 3.5 0 0 0-.436-.294A3.17 3.17 0 0 0 5.5 2.5.5.5 0 0 1 5 2" />
+                    <path d="M10 5h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1h-4v1h4a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-4zM6 5V4H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h4v-1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z" />
+                </svg> &nbsp; Add Text Label
+            </button>  
         </div>
 
         <!-- Relations Tools Section -->
         <div class="panel-section" hidden="hidden">
-            <h3>Relations</h3>
+            <h3>Drag & Drop</h3>
+            <div class="drag-item" draggable="true" @ondragstart="OnDragStartTable" @ondragend="OnDragEnd" data-drag-type="table">
+                <span class="icon">📋</span> Table
+            </div>
             <div class="drag-item" draggable="true" @ondragstart="OnDragStartRelation" @ondragend="OnDragEnd" data-drag-type="relation">
-                <span class="icon">🔗</span> Drag Relation
+                <span class="icon">🔗</span> Relation
             </div>
         </div>
 
@@ -38,19 +46,25 @@
             <button class="btn btn-secondary btn-sm" @onclick="CopyJsonToClipboard">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-fill" viewBox="0 0 16 16">
                     <path fill-rule="evenodd" d="M10 1.5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5zm-5 0A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5v1A1.5 1.5 0 0 1 9.5 4h-3A1.5 1.5 0 0 1 5 2.5zm-2 0h1v1A2.5 2.5 0 0 0 6.5 5h3A2.5 2.5 0 0 0 12 2.5v-1h1a2 2 0 0 1 2 2V14a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V3.5a2 2 0 0 1 2-2" />
-                </svg> Copy
+                </svg> &nbsp; Copy
             </button>
             <button class="btn btn-primary btn-sm" @onclick="DownloadJsonFile">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
                     <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5" />
                     <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z" />
-                </svg> Download
+                </svg> &nbsp; Download
             </button>
             <button class="btn btn-primary btn-sm" @onclick="TriggerFileUpload">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-upload" viewBox="0 0 16 16">
                     <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5" />
                     <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z" />
-                </svg> Load
+                </svg> &nbsp; Load
+            </button>
+            <button class="btn btn-primary btn-sm" @onclick="ExportDiagram">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-floppy" viewBox="0 0 16 16">
+                    <path d="M11 2H9v3h2z" />
+                    <path d="M1.5 0h11.586a1.5 1.5 0 0 1 1.06.44l1.415 1.414A1.5 1.5 0 0 1 16 2.914V14.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 14.5v-13A1.5 1.5 0 0 1 1.5 0M1 1.5v13a.5.5 0 0 0 .5.5H2v-4.5A1.5 1.5 0 0 1 3.5 9h9a1.5 1.5 0 0 1 1.5 1.5V15h.5a.5.5 0 0 0 .5-.5V2.914a.5.5 0 0 0-.146-.353l-1.415-1.415A.5.5 0 0 0 13.086 1H13v4.5A1.5 1.5 0 0 1 11.5 7h-7A1.5 1.5 0 0 1 3 5.5V1H1.5a.5.5 0 0 0-.5.5m3 4a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5V1H4zM3 15h10v-4.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5z" />
+                </svg> &nbsp; Export Diagram
             </button>
             <input type="file" id="jsonFileInput" accept=".json" style="display: none;" @ref="fileInput" @onchange="HandleFileUpload" />
         </div>
@@ -58,9 +72,45 @@
 
     <!-- Main Canvas Area -->
     <div class="canvas-area" 
+         @onmousedown="OnCanvasBackgroundMouseDown"
          @onmousemove="OnCanvasMouseMove"
          @onmouseup="OnCanvasMouseUp"
          @onmouseleave="OnCanvasMouseUp">
+
+        <div class="diagram-surface" id="diagram-export-surface"
+             style="transform: translate(@($"{CanvasOffsetX}px, {CanvasOffsetY}px")) scale(@CanvasZoom); transform-origin: top left;">
+        @foreach (var label in TextLabels)
+        {
+            <div class="text-label-wrapper"
+                 style="left: @(label.X)px; top: @(label.Y)px;"
+                 @onmousedown="(args) => OnTextLabelMouseDown(label, args)"
+                 @onmousedown:stopPropagation="true">
+                @if (EditingTextLabelId == label.Id)
+                {
+                    <input type="text"
+                           class="text-label-input"
+                           @bind="label.Text"
+                           @bind:event="oninput"
+                           @onblur="() => FinishTextLabelEditing()"
+                           @onkeyup="HandleTextLabelKeyUp"
+                           @onmousedown:stopPropagation="true"
+                           autofocus />
+                }
+                else
+                {
+                    <div class="text-label"
+                         @ondblclick="() => StartTextLabelEditing(label.Id)"
+                         @ondblclick:stopPropagation="true">
+                        <span>@label.Text</span>
+                        <button class="text-label-delete"
+                                title="Delete label"
+                                @onclick="() => RemoveTextLabel(label.Id)"
+                                @onclick:stopPropagation="true"
+                                @onmousedown:stopPropagation="true">✕</button>
+                    </div>
+                }
+            </div>
+        }
 
         <!-- Tables Container -->
         <div class="tables-container">
@@ -208,6 +258,7 @@
                     </div>
                 </div>
             }
+
         </div>
 
         <!-- SVG for Relations -->
@@ -289,6 +340,13 @@
                       class="drawing-line" />
             </svg>
         }
+        </div>
+
+        <div class="zoom-controls">
+            <button class="zoom-btn" @onclick="ZoomOut" title="Zoom out">−</button>
+            <button class="zoom-btn zoom-level" @onclick="ResetViewport" title="Reset zoom and position">@($"{CanvasZoom * 100:0}%")</button>
+            <button class="zoom-btn" @onclick="ZoomIn" title="Zoom in">+</button>
+        </div>
     </div>
 
     @if (ShowConfirmDialog)
@@ -341,6 +399,14 @@
         public double? ManualRouteX { get; set; }
     }
 
+    private class TextLabelModel
+    {
+        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public string Text { get; set; } = "New label";
+        public double X { get; set; } = 420;
+        public double Y { get; set; } = 120;
+    }
+
     private class DrawingRelationModel
     {
         public double StartX { get; set; }
@@ -353,10 +419,13 @@
 
     private List<TableModel> Tables = new();
     private List<RelationModel> Relations = new();
+    private List<TextLabelModel> TextLabels = new();
     private string? EditingTableId = null;
+    private string? EditingTextLabelId = null;
     private string DraggedItemType = "";
     private DrawingRelationModel? DrawingRelation = null;
     private TableModel? DraggingTable = null;
+    private TextLabelModel? DraggingTextLabel = null;
     private double DragOffsetX = 0;
     private double DragOffsetY = 0;
     private string JsonOutput = "{}";
@@ -367,6 +436,14 @@
     private bool _relationClickedThisFrame = false;
     private string? DraggingWaypointRelationId = null;
     private double WaypointDragOffsetX = 0;
+    private bool IsPanningCanvas = false;
+    private double CanvasZoom = 1;
+    private double CanvasOffsetX = 0;
+    private double CanvasOffsetY = 0;
+    private double PanStartClientX = 0;
+    private double PanStartClientY = 0;
+    private double PanStartOffsetX = 0;
+    private double PanStartOffsetY = 0;
     private TableModel? ResizingTable = null;
     private double ResizeStartX = 0;
     private double ResizeStartY = 0;
@@ -379,7 +456,6 @@
     private string ConfirmDialogTitle = "";
     private string ConfirmDialogMessage = "";
     private Action? ConfirmDialogAction = null;
-
     private IJSObjectReference? jsModule;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -412,6 +488,20 @@
             Y = 50
         };
         Tables.Add(newTable);
+        UpdateJsonOutput();
+    }
+
+    private void AddTextLabelViaButton()
+    {
+        var label = new TextLabelModel
+        {
+            Text = $"Label {TextLabels.Count + 1}",
+            X = 420,
+            Y = 120 + (TextLabels.Count * 36)
+        };
+
+        TextLabels.Add(label);
+        EditingTextLabelId = label.Id;
         UpdateJsonOutput();
     }
 
@@ -515,17 +605,34 @@
 
     private void OnCanvasMouseMove(MouseEventArgs args)
     {
+        if (IsPanningCanvas)
+        {
+            CanvasOffsetX = PanStartOffsetX + (args.ClientX - PanStartClientX);
+            CanvasOffsetY = PanStartOffsetY + (args.ClientY - PanStartClientY);
+            StateHasChanged();
+            return;
+        }
+
+        var (diagramX, diagramY) = ToDiagramCoordinates(args.ClientX, args.ClientY);
+
         if (DraggingTable != null)
         {
-            DraggingTable.X = args.ClientX - DragOffsetX;
-            DraggingTable.Y = args.ClientY - DragOffsetY;
+            DraggingTable.X = diagramX - DragOffsetX;
+            DraggingTable.Y = diagramY - DragOffsetY;
+            StateHasChanged();
+        }
+
+        if (DraggingTextLabel != null)
+        {
+            DraggingTextLabel.X = diagramX - DragOffsetX;
+            DraggingTextLabel.Y = diagramY - DragOffsetY;
             StateHasChanged();
         }
 
         if (ResizingTable != null)
         {
-            double deltaX = args.ClientX - ResizeStartX;
-            double deltaY = args.ClientY - ResizeStartY;
+            double deltaX = diagramX - ResizeStartX;
+            double deltaY = diagramY - ResizeStartY;
 
             ResizingTable.Width = Math.Max(200, ResizeStartWidth + deltaX);
             ResizingTable.Height = Math.Max(300, ResizeStartHeight + deltaY);
@@ -537,8 +644,15 @@
             var relation = Relations.FirstOrDefault(r => r.Id == DraggingWaypointRelationId);
             if (relation != null)
             {
-                relation.ManualRouteX = args.ClientX - WaypointDragOffsetX;
+                relation.ManualRouteX = diagramX - WaypointDragOffsetX;
             }
+            StateHasChanged();
+        }
+
+        if (DrawingRelation != null)
+        {
+            DrawingRelation.CurrentX = diagramX;
+            DrawingRelation.CurrentY = diagramY;
             StateHasChanged();
         }
     }
@@ -546,8 +660,10 @@
     private void OnCanvasMouseUp()
     {
         DraggingTable = null;
+        DraggingTextLabel = null;
         ResizingTable = null;
         DraggingWaypointRelationId = null;
+        IsPanningCanvas = false;
         if (_relationClickedThisFrame)
         {
             _relationClickedThisFrame = false;
@@ -565,9 +681,54 @@
 
     private void OnTableMouseDown(TableModel table, MouseEventArgs args)
     {
+        var (diagramX, diagramY) = ToDiagramCoordinates(args.ClientX, args.ClientY);
         DraggingTable = table;
-        DragOffsetX = args.ClientX - table.X;
-        DragOffsetY = args.ClientY - table.Y;
+        DragOffsetX = diagramX - table.X;
+        DragOffsetY = diagramY - table.Y;
+    }
+
+    private void OnTextLabelMouseDown(TextLabelModel label, MouseEventArgs args)
+    {
+        if (EditingTextLabelId == label.Id)
+            return;
+
+        var (diagramX, diagramY) = ToDiagramCoordinates(args.ClientX, args.ClientY);
+        DraggingTextLabel = label;
+        DragOffsetX = diagramX - label.X;
+        DragOffsetY = diagramY - label.Y;
+    }
+
+    private void StartTextLabelEditing(string labelId)
+    {
+        EditingTextLabelId = labelId;
+    }
+
+    private void FinishTextLabelEditing()
+    {
+        EditingTextLabelId = null;
+        UpdateJsonOutput();
+    }
+
+    private void RemoveTextLabel(string labelId)
+    {
+        TextLabels.RemoveAll(l => l.Id == labelId);
+        if (EditingTextLabelId == labelId)
+        {
+            EditingTextLabelId = null;
+        }
+        UpdateJsonOutput();
+    }
+
+    private void HandleTextLabelKeyUp(KeyboardEventArgs args)
+    {
+        if (args.Key == "Enter")
+        {
+            FinishTextLabelEditing();
+        }
+        else if (args.Key == "Escape")
+        {
+            EditingTextLabelId = null;
+        }
     }
 
     private void OnTableMouseMove(MouseEventArgs args)
@@ -587,9 +748,10 @@
 
     private void OnResizeMouseDown(TableModel table, MouseEventArgs args)
     {
+        var (diagramX, diagramY) = ToDiagramCoordinates(args.ClientX, args.ClientY);
         ResizingTable = table;
-        ResizeStartX = args.ClientX;
-        ResizeStartY = args.ClientY;
+        ResizeStartX = diagramX;
+        ResizeStartY = diagramY;
         ResizeStartWidth = table.Width;
         ResizeStartHeight = table.Height;
     }
@@ -759,6 +921,13 @@
                 toTable = r.ToTableId,
                 toColumn = r.ToRowIndex,
                 manualRouteX = r.ManualRouteX
+            }).ToList(),
+            labels = TextLabels.Select(l => new
+            {
+                id = l.Id,
+                text = l.Text,
+                x = l.X,
+                y = l.Y
             }).ToList()
         };
 
@@ -923,25 +1092,78 @@
             var path = ComputeRelationPath(relation);
             if (path.Count >= 3)
             {
-                WaypointDragOffsetX = args.ClientX - path[1].X;
+                var (diagramX, _) = ToDiagramCoordinates(args.ClientX, args.ClientY);
+                WaypointDragOffsetX = diagramX - path[1].X;
             }
             DraggingWaypointRelationId = relationId;
             _relationClickedThisFrame = true;
         }
     }
 
+    private void OnCanvasBackgroundMouseDown(MouseEventArgs args)
+    {
+        if (DraggingTable != null || ResizingTable != null || DraggingWaypointRelationId != null || ShowConfirmDialog)
+            return;
+
+        IsPanningCanvas = true;
+        PanStartClientX = args.ClientX;
+        PanStartClientY = args.ClientY;
+        PanStartOffsetX = CanvasOffsetX;
+        PanStartOffsetY = CanvasOffsetY;
+    }
+
+    private (double X, double Y) ToDiagramCoordinates(double clientX, double clientY)
+    {
+        return ((clientX - CanvasOffsetX) / CanvasZoom, (clientY - CanvasOffsetY) / CanvasZoom);
+    }
+
+    private void ZoomIn()
+    {
+        CanvasZoom = Math.Min(2.5, CanvasZoom + 0.1);
+    }
+
+    private void ZoomOut()
+    {
+        CanvasZoom = Math.Max(0.4, CanvasZoom - 0.1);
+    }
+
+    private void ResetViewport()
+    {
+        CanvasZoom = 1;
+        CanvasOffsetX = 0;
+        CanvasOffsetY = 0;
+    }
+
     [JSInvokable]
     public async Task OnDragDropTable(double x, double y)
     {
+        var (diagramX, diagramY) = ToDiagramCoordinates(x, y);
         var newTable = new TableModel
         {
             Name = $"Table_{Tables.Count + 1}",
-            X = x - 100,
-            Y = y - 50
+            X = diagramX - 100,
+            Y = diagramY - 50
         };
         Tables.Add(newTable);
         UpdateJsonOutput();
         await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task ExportDiagram()
+    {
+        if (jsModule == null)
+            return;
+
+        try
+        {
+            await jsModule.InvokeVoidAsync("exportDiagramWithSavePicker", "diagram-export-surface");
+            await jsModule.InvokeVoidAsync("showNotification", "Diagram exported!");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error exporting diagram: {ex.Message}");
+            await jsModule.InvokeVoidAsync("showErrorNotification", $"Error exporting diagram: {ex.Message}");
+        }
     }
 
     private async Task CopyJsonToClipboard()
@@ -1081,6 +1303,7 @@
                 // Clear current diagram
                 Tables.Clear();
                 Relations.Clear();
+                TextLabels.Clear();
 
                 // Load tables
                 foreach (var tableElement in tablesElement.EnumerateArray())
@@ -1134,6 +1357,28 @@
                             table.Rows.Add(column);
                         }
                     }
+
+                if (root.TryGetProperty("labels", out var labelsElement) && labelsElement.ValueKind == JsonValueKind.Array)
+                {
+                    foreach (var labelElement in labelsElement.EnumerateArray())
+                    {
+                        var label = new TextLabelModel();
+
+                        if (labelElement.TryGetProperty("id", out var labelIdElement))
+                            label.Id = labelIdElement.GetString() ?? Guid.NewGuid().ToString();
+
+                        if (labelElement.TryGetProperty("text", out var labelTextElement))
+                            label.Text = labelTextElement.GetString() ?? "New label";
+
+                        if (labelElement.TryGetProperty("x", out var labelXElement) && labelXElement.ValueKind == JsonValueKind.Number)
+                            label.X = labelXElement.GetDouble();
+
+                        if (labelElement.TryGetProperty("y", out var labelYElement) && labelYElement.ValueKind == JsonValueKind.Number)
+                            label.Y = labelYElement.GetDouble();
+
+                        TextLabels.Add(label);
+                    }
+                }
 
                     Console.WriteLine($"Added table: {table.Name} with {table.Rows.Count} columns");
                     Tables.Add(table);
@@ -1232,7 +1477,7 @@
 <style>
     .diagramer-container {
         display: flex;
-        height: 100vh;
+        height: 92vh;
         width: 100%;
         background: var(--bs-body-bg);
         color: var(--bs-body-color);
@@ -1245,7 +1490,7 @@
         border-radius:7px;
         display: flex;
         flex-direction: column;
-        overflow-y: auto;
+        overflow: hidden;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         color: var(--bs-body-color);
     }
@@ -1295,6 +1540,7 @@
         flex: 1;
         display: flex;
         flex-direction: column;
+        min-height: 0;
     }
 
     .json-section .btn {
@@ -1308,11 +1554,12 @@
 
     .json-output {
         flex: 1;
+        min-height: 0;
         background: var(--bs-tertiary-bg);
         border: 1px solid var(--bs-border-color);
         border-radius: 4px;
         padding: 10px;
-        font-size: 11px;
+        font-size: 12px;
         font-family: 'Courier New', monospace;
         overflow-y: auto;
         margin-bottom: 10px;
@@ -1365,6 +1612,80 @@
         background: var(--bs-body-bg);
         overflow: hidden;
         color: var(--bs-body-color);
+        cursor: grab;
+    }
+
+    .canvas-area:active {
+        cursor: grabbing;
+    }
+
+    .diagram-surface {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    .text-label-wrapper {
+        position: absolute;
+        z-index: 6;
+        cursor: move;
+        user-select: none;
+    }
+
+    .text-label {
+        color: var(--bs-body-color);
+        font-size: 18px;
+        font-weight: 600;
+        line-height: 1.3;
+        padding: 4px 8px;
+        border-radius: 4px;
+        background: transparent;
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .text-label:hover {
+        background: rgba(13, 110, 253, 0.08);
+    }
+
+    .text-label-delete {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 18px;
+        height: 18px;
+        border: none;
+        border-radius: 50%;
+        background: #dc3545;
+        color: white;
+        font-size: 11px;
+        line-height: 1;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.2s, background 0.2s;
+    }
+
+    .text-label:hover .text-label-delete {
+        opacity: 1;
+    }
+
+    .text-label-delete:hover {
+        background: #bb2d3b;
+    }
+
+    .text-label-input {
+        min-width: 160px;
+        padding: 4px 8px;
+        border: 1px solid var(--bs-primary);
+        border-radius: 4px;
+        background: var(--bs-body-bg);
+        color: var(--bs-body-color);
+        font-size: 18px;
+        font-weight: 600;
+        outline: none;
     }
 
     .tables-container {
@@ -1894,4 +2215,38 @@
     .confirm-btn-delete:hover {
         background: #bb2d3b;
     }
+
+    .zoom-controls {
+        position: absolute;
+        right: 24px;
+        bottom: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        z-index: 20;
+    }
+
+    .zoom-btn {
+        min-width: 52px;
+        height: 40px;
+        border: 1px solid var(--bs-border-color);
+        border-radius: 8px;
+        background: var(--bs-body-bg);
+        color: var(--bs-body-color);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        font-size: 20px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .zoom-btn:hover {
+        background: var(--bs-tertiary-bg);
+    }
+
+    .zoom-level {
+        font-size: 12px;
+        font-weight: 700;
+    }
+
 </style>
