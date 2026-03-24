@@ -149,7 +149,8 @@
                                 <div class="cell" data-column="name">Name</div>
                                 <div class="cell" data-column="datatype">Datatype</div>
                                 <div class="cell" data-column="length">Length</div>
-                                <div class="cell" data-column="default">Default value</div>
+                                <div class="cell" data-column="default">Default Value</div>
+                                <div class="cell" data-column="null">Null</div>
                                 <div class="cell" data-column="pk">PK(1,1)</div>
                                 <div class="cell cell-delete-header"></div>
                             </div>
@@ -229,6 +230,13 @@
                                            @bind:event="oninput"
                                            @onchange="UpdateJsonOutput"
                                            placeholder="Default" />
+                                    <select class="cell-input cell-select" 
+                                            value="@row.Null"
+                                            @onchange="(ChangeEventArgs e) => HandleNullChange(e, row)">
+                                        <option value=""> --- </option>
+                                        <option value="No">No</option>
+                                        <option value="Yes">Yes</option>
+                                    </select>
                                     <select class="cell-input cell-select" 
                                             value="@row.PrimaryKey"
                                             @onchange="(ChangeEventArgs e) => HandlePrimaryKeyChange(e, row)">
@@ -382,6 +390,7 @@
         public string DataType { get; set; } = "";
         public int? Length { get; set; }
         public string DefaultValue { get; set; } = "";
+        public string Null { get; set; } = "";
         public string PrimaryKey { get; set; } = "";
     }
 
@@ -849,6 +858,15 @@
         }
     }
 
+    private void HandleNullChange(ChangeEventArgs e, ColumnModel row)
+    {
+        if (e.Value != null)
+        {
+            row.Null = e.Value.ToString() ?? "";
+            UpdateJsonOutput();
+        }
+    }
+
     private void MoveRowUp(string tableId)
     {
         var table = Tables.FirstOrDefault(t => t.Id == tableId);
@@ -908,6 +926,7 @@
                     dataType = r.DataType,
                     length = r.Length,
                     defaultValue = r.DefaultValue,
+                    nullable = r.Null,
                     primaryKey = r.PrimaryKey
                 }).ToList()
             }).ToList(),
@@ -1351,6 +1370,9 @@
                             if (columnElement.TryGetProperty("defaultValue", out var defaultElement))
                                 column.DefaultValue = defaultElement.GetString() ?? "";
 
+                            if (columnElement.TryGetProperty("nullable", out var nullElement))
+                                column.Null = nullElement.GetString() ?? "";
+
                             if (columnElement.TryGetProperty("primaryKey", out var pkElement))
                                 column.PrimaryKey = pkElement.GetString() ?? "";
 
@@ -1770,7 +1792,7 @@
 
     .table-row {
         display: grid;
-        grid-template-columns: 20px 2fr 2fr 1fr 1.5fr 1fr 30px;
+        grid-template-columns: 20px 2fr 2fr 1fr 1.5fr 1fr 1fr 30px;
         border-bottom: 1px solid var(--bs-border-color);
         background: var(--bs-body-bg);
         transition: background 0.2s;

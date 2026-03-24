@@ -1,9 +1,452 @@
 ﻿@page "/about"
 
 <PageTitle>About me</PageTitle>
-<div class="align-content-center">
-    <p>Hi, my name is Gabriel Burrola, I'm a Full Stack Developer....</p>
+<div class="about-page">
+    <div class="about-background-glow about-glow-1"></div>
+    <div class="about-background-glow about-glow-2"></div>
+
+    <div class="about-card">
+        <header class="about-hero">
+            <div class="avatar-ring">
+                <div class="avatar-placeholder">
+                    @* <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="avatar-icon">
+                        <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5m0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5" />
+                    </svg> *@
+                    <img src="img/gab.jpg" width="180" />
+                </div>
+            </div>
+            <h1>Gabriel Burrola</h1>
+            <p class="hero-subtitle">.NET Full Stack Developer  •  Trance|EDM Music Producer & DJ </p>
+        </header>
+
+        <section class="about-section accent-panel">
+            <div class="section-title-row">
+                <span class="section-kicker">01</span>
+                <h2>About Me</h2>
+            </div>
+            <p>
+                Hi, my name is Gabriel Burrola, and I’m a passionate .NET Full Stack Developer focused on building elegant,
+                modern, and scalable digital experiences. I enjoy transforming ideas into polished applications that combine
+                strong backend architecture, intuitive UI design, and reliable performance.
+            </p>
+            <p>
+                My work centers around the Microsoft ecosystem, where I love crafting solutions with C#, ASP.NET Core, Blazor, MVC, 
+                REST APIs, SQL, and cloud services. I’m driven by clean code, thoughtful UX, and the challenge of turning complex
+                business needs into software that feels simple, fast, and useful.
+            </p>
+            <p>
+                I've been passionate about Trance & EDM music since late 90s, so I started getting involved into music production and DJing 
+                ever since, you can find some cool stuff on my YouTube channel (link at the bottom of this page).
+            </p>
+        </section>
+
+        <section class="about-grid">
+            <section class="about-section glass-panel">
+                <div class="section-title-row">
+                    <span class="section-kicker">02</span>
+                    <h2>Technical Skills</h2>
+                </div>
+                <div class="skills-cloud">
+                    <span>C#</span>
+                    <span>.NET</span>
+                    <span>ASP.NET Core</span>
+                    <span>Blazor</span>
+                    <span>MVC</span>
+                    <span>Entity Framework Core</span>
+                    <span>SQL Server</span>
+                    <span>Oracle</span>
+                    <span>MySQL/MariaDB</span>
+                    <span>REST APIs</span>
+                    <span>JavaScript</span>
+                    <span>jQuery</span>
+                    <span>HTML5</span>
+                    <span>CSS3</span>
+                    <span>Bootstrap</span>
+                    <span>Azure</span>
+                    <span>CI/CD</span>
+                    <span>Docker</span>
+                    <span>Microservices</span>
+                    <span>Unit Testing</span>
+                    <span>Git</span>
+                    <span>GitHub Copilot</span>
+                </div>
+            </section>
+
+            <section class="about-section glass-panel">
+                <div class="section-title-row">
+                    <span class="section-kicker">03</span>
+                    <h2>Education</h2>
+                </div>
+                <div class="timeline-item compact">
+                    <div class="timeline-dot"></div>
+                    <div>
+                        <h3>Bachelor of Science in Computer Systems Engineering</h3>
+                        <p class="timeline-meta">Universidad Tecnológica de Chihuahua • 2005 - 2007</p>
+                        <p class="timeline-meta">Universidad Tecnológica de Chihuahua • 2012 - 2014</p>
+                        <p>
+                            Built a strong foundation in software engineering, databases, networking, and application development,
+                            with hands-on work across both desktop and web technologies. Specialized in the .NET ecosystem.
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </section>
+
+        <section class="about-section accent-panel">
+            <div class="section-title-row">
+                <span class="section-kicker">04</span>
+                <h2>Professional Experience</h2>
+            </div>
+
+            <div class="timeline">
+                <article class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div>
+                        <h3>Senior .NET Full Stack Developer</h3>
+                        <p class="timeline-meta">Apex Systems • 2025 - Present</p>
+                        <p>
+                            Leading the design and development of enterprise-grade web platforms using ASP.NET Core, Blazor,
+                            SQL Server, and Azure services. Focused on performance, maintainability, and modern user experiences.
+                        </p>
+                    </div>
+                </article>
+
+                <article class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div>
+                        <h3>Senior .NET Full Stack Developer</h3>
+                        <p class="timeline-meta">Freelancer • 2021 - 2025</p>
+                        <p>
+                            Contributed to backend services, database design, and front-end enhancements for multiple client projects,
+                            gaining experience across the full software delivery lifecycle.
+                        </p>
+                    </div>
+                </article>
+
+                <article class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div>
+                        <h3>Full Stack Software Engineer</h3>
+                        <p class="timeline-meta">Gobierno del Estado de Chihuahua • 2008 - 2021</p>
+                        <p>
+                            Built and maintained systems and customer-facing applications, integrating REST APIs,
+                            authentication flows, reporting modules, and responsive front-end interfaces for several areas,
+                            included Education, Security and Health dependencies.
+                        </p>
+                    </div>
+                </article>
+
+            </div>
+        </section>
+
+        <section class="about-section glass-panel">
+            <div class="section-title-row">
+                <span class="section-kicker">05</span>
+                <h2>My Links</h2>
+            </div>
+
+            <div class="social-links">
+                <a class="social-link" href="@youtubeUrl" target="_blank" rel="noopener noreferrer" aria-label="YouTube" title="YouTube">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#cf4442">
+                        <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.7 31.7 0 0 0 0 12a31.7 31.7 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.7 31.7 0 0 0 24 12a31.7 31.7 0 0 0-.5-5.8M9.6 15.5v-7L15.8 12z" />
+                    </svg>
+                </a>
+
+                <a class="social-link" href="https://www.linkedin.com/in/gabriel-burrola-a61190325/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" title="LinkedIn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#1d6ed1">
+                        <path d="M4.98 3.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M3 9h4v12H3zm7 0h3.8v1.7h.1c.5-1 1.8-2.1 3.8-2.1 4.1 0 4.8 2.7 4.8 6.3V21h-4v-5.4c0-1.3 0-3-1.8-3s-2.1 1.4-2.1 2.9V21h-4z" />
+                    </svg>
+                </a>
+
+                <a class="social-link" href="https://github.com/MigraDJ" target="_blank" rel="noopener noreferrer" aria-label="GitHub" title="GitHub">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#969695">
+                        <path d="M12 .5a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.2c-3.3.7-4-1.4-4-1.4-.6-1.4-1.3-1.8-1.3-1.8-1.1-.8.1-.8.1-.8 1.2.1 1.9 1.3 1.9 1.3 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.6-1.4-5.6-6.1 0-1.3.5-2.4 1.3-3.3-.1-.3-.6-1.6.1-3.2 0 0 1.1-.4 3.5 1.3a11.8 11.8 0 0 1 6.4 0c2.4-1.7 3.5-1.3 3.5-1.3.7 1.6.2 2.9.1 3.2.8.9 1.3 2 1.3 3.3 0 4.7-2.9 5.8-5.7 6.1.4.4.9 1.1.9 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .5" />
+                    </svg>
+                </a>
+            </div>
+        </section>
+    </div>
 </div>
 
+@code {
+    public string youtubeUrl = "https://www.youtube.com/@GBRLMGR/videos";
+}   
 
+<style>
+    .about-page {
+        position: relative;
+        border-radius:10px;
+        min-height: calc(100vh - 80px);
+        padding: 48px 24px 64px;
+        overflow: hidden;
+        background:
+            radial-gradient(circle at top left, rgba(13, 110, 253, 0.18), transparent 30%),
+            radial-gradient(circle at top right, rgba(111, 66, 193, 0.18), transparent 28%),
+            linear-gradient(135deg, var(--bs-body-bg), var(--bs-secondary-bg));
+    }
 
+    .about-background-glow {
+        position: absolute;
+        width: 320px;
+        height: 320px;
+        border-radius: 50%;
+        filter: blur(40px);
+        opacity: 0.35;
+        pointer-events: none;
+    }
+
+    .about-glow-1 {
+        top: -80px;
+        left: -60px;
+        background: #0d6efd;
+    }
+
+    .about-glow-2 {
+        right: -80px;
+        bottom: 40px;
+        background: #6f42c1;
+    }
+
+    .about-card {
+        position: relative;
+        z-index: 1;
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 36px;
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 28px;
+        background: color-mix(in srgb, var(--bs-body-bg) 82%, transparent);
+        box-shadow: 0 24px 80px rgba(0,0,0,0.18);
+        backdrop-filter: blur(18px);
+    }
+
+    .about-hero {
+        text-align: center;
+        margin-bottom: 32px;
+    }
+
+    .avatar-ring {
+        width: 180px;
+        height: 180px;
+        margin: 0 auto 20px;
+        padding: 6px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #0d6efd, #6f42c1, #20c997);
+        box-shadow: 0 12px 32px rgba(13, 110, 253, 0.25);
+    }
+
+    .avatar-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: linear-gradient(180deg, var(--bs-secondary-bg), var(--bs-body-bg));
+        color: var(--bs-body-color);
+        overflow: hidden;
+    }
+
+    .avatar-icon {
+        width: 90px;
+        height: 90px;
+        opacity: 0.8;
+    }
+
+    .about-hero h1 {
+        margin: 0;
+        font-size: clamp(2rem, 4vw, 3.25rem);
+        font-weight: 800;
+        letter-spacing: -0.03em;
+    }
+
+    .hero-subtitle {
+        margin: 10px 0 0;
+        font-size: 1rem;
+        color: var(--bs-secondary-color);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+
+    .about-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 24px;
+        margin: 24px 0;
+    }
+
+    .about-section {
+        padding: 24px;
+        border-radius: 22px;
+        margin-bottom: 24px;
+    }
+
+    .glass-panel {
+        border: 1px solid rgba(255,255,255,0.08);
+        background: color-mix(in srgb, var(--bs-tertiary-bg) 78%, transparent);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+
+    .accent-panel {
+        border: 1px solid rgba(13, 110, 253, 0.18);
+        background: linear-gradient(135deg, rgba(13, 110, 253, 0.10), rgba(111, 66, 193, 0.08));
+    }
+
+    .section-title-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 16px;
+    }
+
+    .section-title-row h2 {
+        margin: 0;
+        font-size: 1.4rem;
+        font-weight: 700;
+    }
+
+    .section-kicker {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #0d6efd, #6f42c1);
+        color: white;
+        font-weight: 700;
+        box-shadow: 0 8px 22px rgba(13, 110, 253, 0.25);
+    }
+
+    .about-section p {
+        margin: 0 0 14px;
+        line-height: 1.75;
+        color: var(--bs-body-color);
+    }
+
+    .about-section p:last-child {
+        margin-bottom: 0;
+    }
+
+    .skills-cloud {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .skills-cloud span {
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--bs-body-bg) 78%, transparent);
+        border: 1px solid rgba(13, 110, 253, 0.18);
+        color: var(--bs-body-color);
+        font-size: 0.95rem;
+        font-weight: 600;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+    }
+
+    .timeline {
+        display: grid;
+        gap: 18px;
+    }
+
+    .timeline-item {
+        display: grid;
+        grid-template-columns: 24px 1fr;
+        gap: 16px;
+        align-items: start;
+        padding: 16px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .timeline-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .timeline-item.compact {
+        padding-top: 8px;
+    }
+
+    .timeline-dot {
+        width: 14px;
+        height: 14px;
+        margin-top: 6px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #20c997, #0d6efd);
+        box-shadow: 0 0 0 6px rgba(13, 110, 253, 0.10);
+    }
+
+    .timeline-item h3 {
+        margin: 0 0 6px;
+        font-size: 1.05rem;
+        font-weight: 700;
+    }
+
+    .timeline-meta {
+        margin-bottom: 10px !important;
+        color: var(--bs-secondary-color) !important;
+        font-size: 0.95rem;
+        font-weight: 600;
+    }
+
+    .social-links {
+        display: flex;
+        justify-content: center;
+        gap: 18px;
+        flex-wrap: wrap;
+        padding-top: 8px;
+    }
+
+    .social-link {
+        width: 58px;
+        height: 58px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 18px;
+        color: var(--bs-body-color);
+        background: color-mix(in srgb, var(--bs-body-bg) 78%, transparent);
+        border: 1px solid rgba(13, 110, 253, 0.18);
+        box-shadow: 0 12px 26px rgba(0,0,0,0.08);
+        transition: transform 0.2s, box-shadow 0.2s, color 0.2s, border-color 0.2s;
+    }
+
+    .social-link:hover {
+        transform: translateY(-4px) scale(1.04);
+        color: #0d6efd;
+        border-color: rgba(13, 110, 253, 0.45);
+        box-shadow: 0 16px 30px rgba(13, 110, 253, 0.15);
+    }
+
+    .social-link svg {
+        width: 26px;
+        height: 26px;
+    }
+
+    @@media (max-width: 900px) {
+        .about-card {
+            padding: 24px;
+        }
+
+        .about-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .about-page {
+            padding: 24px 12px 40px;
+        }
+
+        .about-card {
+            padding: 18px;
+            border-radius: 20px;
+        }
+
+        .avatar-ring {
+            width: 140px;
+            height: 140px;
+        }
+    }
+</style>
