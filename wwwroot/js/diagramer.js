@@ -456,12 +456,10 @@ function inferFormatFromHandle(handle) {
 }
 
 export async function exportDiagramWithSavePicker(elementId) {
-    const canvas = await renderDiagramCanvas(elementId);
-
     if (window.showSaveFilePicker) {
         const handle = await window.showSaveFilePicker(getPickerOptions());
         const format = inferFormatFromHandle(handle);
-        const blob = await getExportBlob(canvas, format);
+        const blob = await getExportBlob(await renderDiagramCanvas(elementId), format);
         if (!blob) {
             throw new Error('Failed to create export file');
         }
@@ -478,7 +476,7 @@ export async function exportDiagramWithSavePicker(elementId) {
     }
 
     const format = formatInput.toLowerCase();
-    const blob = await getExportBlob(canvas, format);
+    const blob = await getExportBlob(await renderDiagramCanvas(elementId), format);
     if (!blob) {
         throw new Error('Failed to create export file');
     }
