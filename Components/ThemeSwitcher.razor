@@ -39,19 +39,30 @@
     private string CurrentTheme = "auto";
     private bool IsConnected = true;
     private bool IsDisposed = false;
+    private bool _initialized = false;
 
     protected override async Task OnInitializedAsync()
     {
+        ThemeService.OnThemeChanged += HandleThemeRefresh;
+        CurrentTheme = ThemeService.GetCurrentTheme();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender || _initialized)
+            return;
+
+        _initialized = true;
+
         try
         {
             await ThemeService.InitializeAsync();
             CurrentTheme = ThemeService.GetCurrentTheme();
-            ThemeService.OnThemeChanged += HandleThemeRefresh;
             IsConnected = true;
+            StateHasChanged();
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error initializing theme switcher: {ex.Message}");
             IsConnected = false;
         }
     }
@@ -66,27 +77,17 @@
             CurrentTheme = theme;
             await ThemeService.SetThemeAsync(theme);
         }
-        catch (Exception ex)
+        catch
         {
-            Console.WriteLine($"Error changing theme: {ex.Message}");
             IsConnected = false;
         }
     }
 
-    private async Task OnLightTheme(ChangeEventArgs e)
-    {
-        await HandleThemeChange("light");
-    }
+    private async Task OnLightTheme(ChangeEventArgs e) => await HandleThemeChange("light");
 
-    private async Task OnAutoTheme(ChangeEventArgs e)
-    {
-        await HandleThemeChange("auto");
-    }
+    private async Task OnAutoTheme(ChangeEventArgs e) => await HandleThemeChange("auto");
 
-    private async Task OnDarkTheme(ChangeEventArgs e)
-    {
-        await HandleThemeChange("dark");
-    }
+    private async Task OnDarkTheme(ChangeEventArgs e) => await HandleThemeChange("dark");
 
     private void HandleThemeRefresh()
     {
@@ -110,9 +111,9 @@
             ThemeService.OnThemeChanged -= HandleThemeRefresh;
             await ThemeService.DisposeAsync();
         }
-        catch (Exception ex)
+        catch
         {
-            Console.WriteLine($"Error disposing theme switcher: {ex.Message}");
+            // Suppress errors during disposal
         }
     }
 }
