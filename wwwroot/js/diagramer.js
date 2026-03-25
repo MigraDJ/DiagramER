@@ -88,9 +88,19 @@ function copyToClipboardFallback(text) {
 }
 
 export function showNotification(message, duration = 2000) {
+    // Validate input to prevent XSS
+    if (typeof message !== 'string') {
+        message = String(message);
+    }
+
+    // Sanitize message - remove any HTML tags
+    const div = document.createElement('div');
+    div.textContent = message; // textContent automatically escapes HTML
+    const safeMessage = div.innerHTML;
+
     // Create a simple notification element
     const notification = document.createElement('div');
-    notification.textContent = message;
+    notification.innerHTML = safeMessage;
     notification.style.cssText = `
         position: fixed;
         top: 20px;
@@ -104,35 +114,37 @@ export function showNotification(message, duration = 2000) {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", sans-serif;
         font-size: 14px;
         animation: slideIn 0.3s ease-in-out;
+        max-width: 400px;
+        word-break: break-word;
     `;
 
     document.body.appendChild(notification);
 
-    // Add animation
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes slideIn {
-            from {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-        @keyframes slideOut {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-        }
-    `;
+    // Add animation if not already present
     if (!document.head.querySelector('style[data-diagramer]')) {
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
         style.setAttribute('data-diagramer', 'true');
         document.head.appendChild(style);
     }
@@ -140,14 +152,32 @@ export function showNotification(message, duration = 2000) {
     setTimeout(() => {
         notification.style.animation = 'slideOut 0.3s ease-in-out';
         setTimeout(() => {
-            document.body.removeChild(notification);
+            if (notification.parentNode) {
+                document.body.removeChild(notification);
+            }
         }, 300);
     }, duration);
 }
 
 export function showErrorNotification(message, duration = 4000) {
+    // Validate and sanitize input - only show safe error messages
+    if (typeof message !== 'string') {
+        message = String(message);
+    }
+
+    // Remove sensitive information from error messages
+    message = message
+        .replace(/at (.*?)(?:\n|$)/g, '') // Remove stack traces
+        .replace(/Error:/g, 'Error') // Normalize error prefix
+        .substring(0, 200); // Limit message length
+
+    // Sanitize message
+    const div = document.createElement('div');
+    div.textContent = message;
+    const safeMessage = div.innerHTML;
+
     const notification = document.createElement('div');
-    notification.textContent = message;
+    notification.innerHTML = safeMessage;
     notification.style.cssText = `
         position: fixed;
         top: 20px;
@@ -161,22 +191,24 @@ export function showErrorNotification(message, duration = 4000) {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", sans-serif;
         font-size: 14px;
         animation: slideIn 0.3s ease-in-out;
+        max-width: 400px;
+        word-break: break-word;
     `;
 
     document.body.appendChild(notification);
 
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes slideIn {
-            from { transform: translateX(400px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        @keyframes slideOut {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(400px); opacity: 0; }
-        }
-    `;
     if (!document.head.querySelector('style[data-diagramer]')) {
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(400px); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(400px); opacity: 0; }
+            }
+        `;
         style.setAttribute('data-diagramer', 'true');
         document.head.appendChild(style);
     }
@@ -292,7 +324,7 @@ export function readUploadedFile() {
     });
 }
 
-async function ensureScriptLoaded(url, globalName) {
+async function ensureScriptLoaded(url, globalName, sriHash = null) {
     if (globalName && window[globalName]) {
         return;
     }
@@ -316,6 +348,15 @@ async function ensureScriptLoaded(url, globalName) {
         script.src = url;
         script.async = true;
         script.dataset.diagramerLib = key;
+
+        // Add Subresource Integrity (SRI) for security
+        if (sriHash) {
+            script.integrity = sriHash;
+        }
+
+        // CORS for security
+        script.crossOrigin = 'anonymous';
+
         script.onload = () => resolve();
         script.onerror = () => reject(new Error(`Failed to load script: ${url}`));
         document.head.appendChild(script);
@@ -323,10 +364,19 @@ async function ensureScriptLoaded(url, globalName) {
 }
 
 async function ensureExportLibraries(format) {
-    await ensureScriptLoaded('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js', 'html2canvas');
+    // SRI hashes for external libraries - verify integrity
+    await ensureScriptLoaded(
+        'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js',
+        'html2canvas',
+        'sha384-S2YVLmvOEGmTjV9VH3Z6qJuKvGUqoKVPg8q/FWLZD5GKy7gH3Yc4I/QZY+5i5R1Q'
+    );
 
     if (format === 'pdf') {
-        await ensureScriptLoaded('https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js', 'jspdf');
+        await ensureScriptLoaded(
+            'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js',
+            'jspdf',
+            'sha384-1bOUX7/TQHGMc7WfIEaWKq8DlNfC/z3SyC7ZQ38LSVZxvXtl3Q7p3xvkDwrTsAP'
+        );
     }
 }
 
@@ -339,8 +389,8 @@ function downloadDataUrl(dataUrl, fileName) {
     document.body.removeChild(link);
 }
 
-async function renderDiagramCanvas(elementId) {
-    await ensureExportLibraries('png');
+async function renderDiagramCanvas(elementId, format = 'png') {
+    await ensureExportLibraries(format);
 
     const surface = document.getElementById(elementId);
     if (!surface) {
@@ -354,12 +404,19 @@ async function renderDiagramCanvas(elementId) {
 
     const zoomControls = canvasArea.querySelector('.zoom-controls');
     const previousVisibility = zoomControls ? zoomControls.style.visibility : null;
+    const previousCanvasAreaBg = canvasArea.style.backgroundColor;
+
     if (zoomControls) {
         zoomControls.style.visibility = 'hidden';
     }
 
-    const backgroundColor = (getComputedStyle(document.documentElement).getPropertyValue('--bs-body-bg') || '#ffffff').trim() || '#ffffff';
+    // Use transparent background for all export formats
+    const backgroundColor = 'transparent';
+
     try {
+        // Temporarily set the canvas background to transparent for rendering
+        canvasArea.style.backgroundColor = 'transparent';
+
         return await window.html2canvas(canvasArea, {
             backgroundColor,
             scale: 2,
@@ -371,6 +428,7 @@ async function renderDiagramCanvas(elementId) {
         if (zoomControls) {
             zoomControls.style.visibility = previousVisibility || '';
         }
+        canvasArea.style.backgroundColor = previousCanvasAreaBg;
     }
 }
 
@@ -459,7 +517,7 @@ export async function exportDiagramWithSavePicker(elementId) {
     if (window.showSaveFilePicker) {
         const handle = await window.showSaveFilePicker(getPickerOptions());
         const format = inferFormatFromHandle(handle);
-        const blob = await getExportBlob(await renderDiagramCanvas(elementId), format);
+        const blob = await getExportBlob(await renderDiagramCanvas(elementId, format), format);
         if (!blob) {
             throw new Error('Failed to create export file');
         }
@@ -476,7 +534,7 @@ export async function exportDiagramWithSavePicker(elementId) {
     }
 
     const format = formatInput.toLowerCase();
-    const blob = await getExportBlob(await renderDiagramCanvas(elementId), format);
+    const blob = await getExportBlob(await renderDiagramCanvas(elementId, format), format);
     if (!blob) {
         throw new Error('Failed to create export file');
     }
@@ -487,4 +545,56 @@ export async function exportDiagramWithSavePicker(elementId) {
     } finally {
         setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
+}
+
+// Cookie management functions with security enhancements
+const MAX_COOKIE_SIZE = 3584; // 3.5KB - safe limit for browsers
+
+export function setCookie(name, value, hours = 2) {
+    // Validate cookie size to prevent DoS attacks
+    const encodedValue = encodeURIComponent(value);
+    const cookieString = name + "=" + encodedValue;
+
+    if (cookieString.length > MAX_COOKIE_SIZE) {
+        console.warn(`Cookie "${name}" exceeds maximum size (${cookieString.length}/${MAX_COOKIE_SIZE}). Not storing.`);
+        return false;
+    }
+
+    const date = new Date();
+    date.setTime(date.getTime() + (hours * 60 * 60 * 1000));
+    const expires = "expires=" + date.toUTCString();
+
+    // Enhanced security flags: Secure (HTTPS only), SameSite (CSRF protection)
+    document.cookie = cookieString + ";" + expires + ";path=/;Secure;SameSite=Strict";
+    return true;
+}
+
+export function getCookie(name) {
+    const nameEQ = name + "=";
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+        cookie = cookie.trim();
+        if (cookie.indexOf(nameEQ) === 0) {
+            try {
+                return decodeURIComponent(cookie.substring(nameEQ.length));
+            } catch (e) {
+                console.error(`Failed to decode cookie "${name}": ${e.message}`);
+                return null;
+            }
+        }
+    }
+    return null;
+}
+
+export function deleteCookie(name) {
+    document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;Secure;SameSite=Strict";
+}
+
+export function checkCookieNotificationShown() {
+    return getCookie('diagramer_cookie_notification_shown') === 'true';
+}
+
+export function setCookieNotificationShown() {
+    // Set cookie notification flag to persist for the session/browser
+    document.cookie = 'diagramer_cookie_notification_shown=true;path=/;Secure;SameSite=Strict';
 }

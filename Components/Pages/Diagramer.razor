@@ -43,23 +43,34 @@
             <div class="json-output">
                 <pre>@JsonOutput</pre>
             </div>
+            
             <button class="btn btn-secondary btn-sm" @onclick="CopyJsonToClipboard">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-fill" viewBox="0 0 16 16">
                     <path fill-rule="evenodd" d="M10 1.5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5zm-5 0A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5v1A1.5 1.5 0 0 1 9.5 4h-3A1.5 1.5 0 0 1 5 2.5zm-2 0h1v1A2.5 2.5 0 0 0 6.5 5h3A2.5 2.5 0 0 0 12 2.5v-1h1a2 2 0 0 1 2 2V14a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V3.5a2 2 0 0 1 2-2" />
                 </svg> &nbsp; Copy
             </button>
-            <button class="btn btn-primary btn-sm" @onclick="DownloadJsonFile">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
-                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5" />
-                    <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z" />
-                </svg> &nbsp; Download
-            </button>
-            <button class="btn btn-primary btn-sm" @onclick="TriggerFileUpload">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-upload" viewBox="0 0 16 16">
-                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5" />
-                    <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z" />
-                </svg> &nbsp; Load
-            </button>
+            <table style="margin-bottom:6px">
+                <tbody>
+                    <tr>
+                        <td style="width:50%; padding-right:4px;">
+                            <button class="btn btn-outline-primary btn-sm" @onclick="DownloadJsonFile">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+                                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5" />
+                                    <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z" />
+                                </svg> &nbsp; Download
+                            </button>
+                        </td>
+                        <td style="width:50%; padding-left:4px;">
+                            <button class="btn btn-outline-primary btn-sm" @onclick="TriggerFileUpload">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-upload" viewBox="0 0 16 16">
+                                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5" />
+                                    <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z" />
+                                </svg> &nbsp; Load
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
             <button class="btn btn-primary btn-sm" @onclick="ExportDiagram">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-floppy" viewBox="0 0 16 16">
                     <path d="M11 2H9v3h2z" />
@@ -67,9 +78,8 @@
                 </svg> &nbsp; Export Diagram
             </button>
             <button class="btn btn-primary btn-sm" @onclick="GenerateSqlScript">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-braces-asterisk" viewBox="0 0 16 16">
-                    <path fill-rule="evenodd" d="M1.114 8s-1.063-1.497-1.063-2.5C.05 4.55.792 4 1.5 4h.5v1h-.5c-.217 0-.45.15-.45.5 0 .567.69 1.684 1.063 2.2L2.428 8l-.315.3C1.74 8.816 1.05 9.933 1.05 10.5c0 .35.233.5.45.5H2v1h-.5C.792 12 .05 11.45.05 10.5c0-1.003 1.063-2.5 1.063-2.5M14.886 8s1.063-1.497 1.063-2.5c0-.95-.742-1.5-1.45-1.5H14v1h.5c.217 0 .45.15.45.5 0 .567-.69 1.684-1.063 2.2L13.572 8l.315.3c.373.516 1.063 1.633 1.063 2.2 0 .35-.233.5-.45.5H14v1h.5c.708 0 1.45-.55 1.45-1.5 0-1.003-1.063-2.5-1.063-2.5" />
-                    <path d="M7.5 1.018a.5.5 0 0 1 .978 0l.123.62a.5.5 0 0 0 .377.377l.62.123a.5.5 0 0 1 0 .978l-.62.123a.5.5 0 0 0-.377.377l-.123.62a.5.5 0 0 1-.978 0l-.123-.62a.5.5 0 0 0-.377-.377l-.62-.123a.5.5 0 0 1 0-.978l.62-.123a.5.5 0 0 0 .377-.377zM6 8a.5.5 0 0 1 .978 0l.14.707a.5.5 0 0 0 .377.377l.707.14a.5.5 0 0 1 0 .978l-.707.14a.5.5 0 0 0-.377.377l-.14.707a.5.5 0 0 1-.978 0l-.14-.707a.5.5 0 0 0-.377-.377l-.707-.14a.5.5 0 0 1 0-.978l.707-.14a.5.5 0 0 0 .377-.377zm3.5 3.982a.5.5 0 0 1 .978 0l.123.62a.5.5 0 0 0 .377.377l.62.123a.5.5 0 0 1 0 .978l-.62.123a.5.5 0 0 0-.377.377l-.123.62a.5.5 0 0 1-.978 0l-.123-.62a.5.5 0 0 0-.377-.377l-.62-.123a.5.5 0 0 1 0-.978l.62-.123a.5.5 0 0 0 .377-.377z" />
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-database-fill" viewBox="0 0 16 16">
+                    <path d="M4.318 2.687C5.234 2.271 6.536 2 8 2s2.766.27 3.682.687C12.644 3.125 13 3.627 13 4c0 .374-.356.875-1.318 1.313C10.766 5.729 9.464 6 8 6s-2.766-.27-3.682-.687C3.356 4.875 3 4.373 3 4c0-.374.356-.875 1.318-1.313M13 5.698V7c0 .374-.356.875-1.318 1.313C10.766 8.729 9.464 9 8 9s-2.766-.27-3.682-.687C3.356 7.875 3 7.373 3 7V5.698c.271.202.58.378.904.525C4.978 6.711 6.427 7 8 7s3.022-.289 4.096-.777A5 5 0 0 0 13 5.698M14 4c0-1.007-.875-1.755-1.904-2.223C11.022 1.289 9.573 1 8 1s-3.022.289-4.096.777C2.875 2.245 2 2.993 2 4v9c0 1.007.875 1.755 1.904 2.223C4.978 15.71 6.427 16 8 16s3.022-.289 4.096-.777C13.125 14.755 14 14.007 14 13zm-1 4.698V10c0 .374-.356.875-1.318 1.313C10.766 11.729 9.464 12 8 12s-2.766-.27-3.682-.687C3.356 10.875 3 10.373 3 10V8.698c.271.202.58.378.904.525C4.978 9.71 6.427 10 8 10s3.022-.289 4.096-.777A5 5 0 0 0 13 8.698m0 3V13c0 .374-.356.875-1.318 1.313C10.766 14.729 9.464 15 8 15s-2.766-.27-3.682-.687C3.356 13.875 3 13.373 3 13v-1.302c.271.202.58.378.904.525C4.978 12.71 6.427 13 8 13s3.022-.289 4.096-.777c.324-.147.633-.323.904-.525" />
                 </svg> &nbsp; Generate SQL
             </button>
             <input type="file" id="jsonFileInput" accept=".json" style="display: none;" @ref="fileInput" @onchange="HandleFileUpload" />
@@ -393,9 +403,32 @@
                     </div>
                 </div>
                 <div class="confirm-footer">
-                    <button class="confirm-btn confirm-btn-cancel" @onclick="CloseSqlModal">Close</button>
-                    <button class="confirm-btn sql-copy-btn" @onclick="CopySqlToClipboard">Copy SQL</button>
+                    <button class="btn btn-secondary btn-sm" @onclick="CloseSqlModal">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-square-fill" viewBox="0 0 16 16">
+                            <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm3.354 4.646L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 1 1 .708-.708" />
+                        </svg> &nbsp; Close
+                        </button>
+                    <button class="btn btn-primary btn-sm" @onclick="CopySqlToClipboard">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-fill" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M10 1.5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5zm-5 0A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5v1A1.5 1.5 0 0 1 9.5 4h-3A1.5 1.5 0 0 1 5 2.5zm-2 0h1v1A2.5 2.5 0 0 0 6.5 5h3A2.5 2.5 0 0 0 12 2.5v-1h1a2 2 0 0 1 2 2V14a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V3.5a2 2 0 0 1 2-2" />
+                        </svg> &nbsp; Copy SQL
+                    </button>
                 </div>
+            </div>
+        </div>
+    }
+
+    <!-- Cookie Notification -->
+    @if (ShowCookieNotification)
+    {
+        <div class="cookie-notification">
+            <div class="cookie-notification-content">
+                <span class="cookie-notification-text">
+                    This site uses a cookie to temporarily backup your diagram data. Your data is stored in this secure cookie for up to 2 hours.
+                    Make sure you download a backup to your computer by clicking "Download", so you can be able to load it later and continue
+                    working on your diagram.
+                </span>
+                <button class="cookie-notification-btn" @onclick="CloseCookieNotification">OK</button>
             </div>
         </div>
     }
@@ -408,7 +441,7 @@
         public string Name { get; set; } = "New Table";
         public double X { get; set; } = 50;
         public double Y { get; set; } = 50;
-        public double Width { get; set; } = 400;
+        public double Width { get; set; } = 600;
         public double Height { get; set; } = 400;
         public List<ColumnModel> Rows { get; set; } = new();
     }
@@ -489,6 +522,9 @@
     private double ResizeStartHeight = 0;
     private ElementReference fileInput;
 
+    // Cookie notification state
+    private bool ShowCookieNotification = false;
+
     // Confirmation dialog state
     private bool ShowConfirmDialog = false;
     private string ConfirmDialogTitle = "";
@@ -506,6 +542,28 @@
             {
                 jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/diagramer.js");
                 await jsModule.InvokeVoidAsync("initDragDrop", DotNetObjectReference.Create(this));
+
+                // Check if cookie notification has been shown
+                bool notificationShown = await jsModule.InvokeAsync<bool>("checkCookieNotificationShown");
+                if (!notificationShown)
+                {
+                    ShowCookieNotification = true;
+                    StateHasChanged();
+                }
+
+                // Load diagram from cookie backup if available
+                string? backupJson = await jsModule.InvokeAsync<string>("getCookie", "diagramer_backup");
+                if (!string.IsNullOrEmpty(backupJson))
+                {
+                    try
+                    {
+                        await LoadDiagramFromJson(backupJson);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error loading backup from cookie: {ex.Message}");
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -991,6 +1049,12 @@
         };
 
         JsonOutput = JsonSerializer.Serialize(schema, options);
+
+        // Save to cookie backup (2 hours)
+        if (jsModule != null)
+        {
+            _ = jsModule.InvokeVoidAsync("setCookie", "diagramer_backup", JsonOutput, 2);
+        }
     }
 
     private void UpdateRelationNames()
@@ -1144,7 +1208,24 @@
 
     private static string EscapeSqlIdentifier(string? identifier)
     {
-        return string.IsNullOrWhiteSpace(identifier) ? "Unnamed" : identifier.Replace("]", "]]", StringComparison.Ordinal);
+        if (string.IsNullOrWhiteSpace(identifier))
+            return "Unnamed";
+
+        // Validate identifier length (SQL Server limit is 128 characters)
+        if (identifier.Length > 128)
+            identifier = identifier.Substring(0, 128);
+
+        // Escape special characters for SQL Server identifiers
+        identifier = identifier.Replace("]", "]]", StringComparison.Ordinal);
+
+        // Remove or replace potentially dangerous characters
+        // Allow only alphanumeric, underscore, and numbers (but not starting with number)
+        var sanitized = System.Text.RegularExpressions.Regex.Replace(identifier, @"[^\w\s]", "_");
+
+        if (string.IsNullOrWhiteSpace(sanitized))
+            return "Unnamed";
+
+        return sanitized;
     }
 
     private static string GetSqlServerColumnDefinition(ColumnModel column)
@@ -1184,6 +1265,15 @@
     private void CloseSqlModal()
     {
         ShowSqlModal = false;
+    }
+
+    private async Task CloseCookieNotification()
+    {
+        ShowCookieNotification = false;
+        if (jsModule != null)
+        {
+            await jsModule.InvokeVoidAsync("setCookieNotificationShown");
+        }
     }
 
     private async Task CopySqlToClipboard()
@@ -1240,6 +1330,10 @@
 
             foreach (var table in Tables)
             {
+                // Skip the source and destination tables themselves
+                if (table.Id == relation.FromTableId || table.Id == relation.ToTableId)
+                    continue;
+
                 double tLeft = table.X;
                 double tRight = table.X + table.Width;
                 double tTop = table.Y;
@@ -1339,6 +1433,12 @@
         }
         catch (Exception ex)
         {
+            // Silently ignore user cancellation
+            if (ex.Message.Contains("aborted", StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
             Console.WriteLine($"Error exporting diagram: {ex.Message}");
             await jsModule.InvokeVoidAsync("showErrorNotification", $"Error exporting diagram: {ex.Message}");
         }
@@ -1425,6 +1525,17 @@
             var fileContent = await jsModule.InvokeAsync<string>("readUploadedFile");
             Console.WriteLine($"File content length: {fileContent?.Length ?? 0}");
 
+            // Security: Validate file size (5MB limit)
+            const int MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+            if (!string.IsNullOrEmpty(fileContent) && fileContent.Length > MAX_FILE_SIZE)
+            {
+                if (jsModule != null)
+                {
+                    await jsModule.InvokeVoidAsync("showErrorNotification", "File is too large. Maximum size is 5MB.", 4000);
+                }
+                return;
+            }
+
             if (!string.IsNullOrEmpty(fileContent))
             {
                 Console.WriteLine("Loading diagram from JSON");
@@ -1443,10 +1554,10 @@
         catch (Exception ex)
         {
             Console.WriteLine($"Error handling file upload: {ex.Message}");
-            Console.WriteLine($"Stack trace: {ex.StackTrace}");
+            // Don't expose stack traces to users - security measure
             if (jsModule != null)
             {
-                await jsModule.InvokeVoidAsync("showNotification", $"Error loading file: {ex.Message}", 3000);
+                await jsModule.InvokeVoidAsync("showErrorNotification", "Error loading file. Please ensure the file is valid JSON.", 3000);
             }
         }
     }
@@ -2483,6 +2594,85 @@
     .zoom-level {
         font-size: 12px;
         font-weight: 700;
+    }
+
+    /* Cookie Notification Styles */
+    .cookie-notification {
+        position: fixed;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--bs-body-bg);
+        border: 1px solid var(--bs-border-color);
+        border-top: 2px solid var(--bs-primary);
+        border-radius: 8px 8px 0 0;
+        box-shadow: 0 -4px 12px rgba(0,0,0,0.15);
+        padding: 16px 20px;
+        margin-bottom: 0;
+        z-index: 9999;
+        max-width: 600px;
+        animation: slideUp 0.3s ease-out;
+    }
+
+    @@keyframes slideUp {
+        from {
+            transform: translateX(-50%) translateY(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .cookie-notification-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+    }
+
+    .cookie-notification-text {
+        color: var(--bs-body-color);
+        font-size: 14px;
+        line-height: 1.5;
+        flex: 1;
+    }
+
+    .cookie-notification-btn {
+        padding: 8px 20px;
+        background: var(--bs-primary);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.2s;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .cookie-notification-btn:hover {
+        background: var(--bs-primary);
+        opacity: 0.9;
+    }
+
+    @@media (max-width: 600px) {
+        .cookie-notification {
+            max-width: calc(100vw - 20px);
+            margin: 10px;
+            bottom: 10px;
+            border-radius: 8px;
+        }
+
+        .cookie-notification-content {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .cookie-notification-btn {
+            align-self: flex-end;
+        }
     }
 
 </style>
