@@ -223,9 +223,9 @@ export function showErrorNotification(message, duration = 4000) {
     }, duration);
 }
 
-export function downloadFile(byteArray, fileName, mimeType) {
-    // Convert byte array to blob
-    const blob = new Blob([new Uint8Array(byteArray)], { type: mimeType });
+export function downloadFile(content, fileName, mimeType) {
+    const normalizedContent = typeof content === 'string' ? content : String(content ?? '');
+    const blob = new Blob([normalizedContent], { type: `${mimeType};charset=utf-8` });
 
     // Create a download link
     const url = URL.createObjectURL(blob);
@@ -549,45 +549,118 @@ export async function exportDiagramWithSavePicker(elementId) {
 
 // Cookie management functions with security enhancements
 const MAX_COOKIE_SIZE = 3584; // 3.5KB - safe limit for browsers
+const COOKIE_CHUNK_SUFFIX = '__chunks';
 
-export function setCookie(name, value, hours = 2) {
-    // Validate cookie size to prevent DoS attacks
-    const encodedValue = encodeURIComponent(value);
-    const cookieString = name + "=" + encodedValue;
-
-    if (cookieString.length > MAX_COOKIE_SIZE) {
-        console.warn(`Cookie "${name}" exceeds maximum size (${cookieString.length}/${MAX_COOKIE_SIZE}). Not storing.`);
-        return false;
-    }
-
-    const date = new Date();
-    date.setTime(date.getTime() + (hours * 60 * 60 * 1000));
-    const expires = "expires=" + date.toUTCString();
-
-    // Enhanced security flags: Secure (HTTPS only), SameSite (CSRF protection)
-    document.cookie = cookieString + ";" + expires + ";path=/;Secure;SameSite=Strict";
-    return true;
+function getStorageAttributes() {
+    const isHttps = window.location.protocol === 'https:';
+    return `;path=/;SameSite=Lax${isHttps ? ';Secure' : ''}`;
 }
 
-export function getCookie(name) {
+function getRawCookie(name) {
     const nameEQ = name + "=";
     const cookies = document.cookie.split(';');
     for (let cookie of cookies) {
         cookie = cookie.trim();
         if (cookie.indexOf(nameEQ) === 0) {
+            return cookie.substring(nameEQ.length);
+        }
+    }
+
+    return null;
+}
+
+function expireCookie(name) {
+    document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 UTC" + getStorageAttributes();
+}
+
+function deleteChunkedCookies(name) {
+    const chunkCountRaw = getRawCookie(name + COOKIE_CHUNK_SUFFIX);
+    if (!chunkCountRaw) {
+        return;
+    }
+
+    const chunkCount = parseInt(chunkCountRaw, 10);
+    if (!Number.isNaN(chunkCount)) {
+        for (let index = 0; index < chunkCount; index++) {
+            expireCookie(`${name}_${index}`);
+        }
+    }
+
+    expireCookie(name + COOKIE_CHUNK_SUFFIX);
+}
+
+export function setCookie(name, value, hours = 2) {
+    const encodedValue = encodeURIComponent(value);
+    const date = new Date();
+    date.setTime(date.getTime() + (hours * 60 * 60 * 1000));
+    const expires = "expires=" + date.toUTCString();
+
+    expireCookie(name);
+    deleteChunkedCookies(name);
+
+    const singleCookie = name + "=" + encodedValue;
+    if (singleCookie.length <= MAX_COOKIE_SIZE) {
+        document.cookie = singleCookie + ";" + expires + getStorageAttributes();
+        return true;
+    }
+
+    const availableChunkSize = Math.max(256, MAX_COOKIE_SIZE - (name.length + 20));
+    const chunkCount = Math.ceil(encodedValue.length / availableChunkSize);
+
+    for (let index = 0; index < chunkCount; index++) {
+        const chunkName = `${name}_${index}`;
+        const chunkValue = encodedValue.slice(index * availableChunkSize, (index + 1) * availableChunkSize);
+        const chunkCookie = chunkName + "=" + chunkValue;
+
+        if (chunkCookie.length > MAX_COOKIE_SIZE) {
+            console.error(`Chunk cookie "${chunkName}" exceeds maximum size.`);
+            deleteChunkedCookies(name);
+            return false;
+        }
+
+        document.cookie = chunkCookie + ";" + expires + getStorageAttributes();
+    }
+
+    document.cookie = `${name}${COOKIE_CHUNK_SUFFIX}=${chunkCount};${expires}${getStorageAttributes()}`;
+
+    return true;
+}
+
+export function getCookie(name) {
+    const chunkCountRaw = getRawCookie(name + COOKIE_CHUNK_SUFFIX);
+    if (chunkCountRaw) {
+        const chunkCount = parseInt(chunkCountRaw, 10);
+        if (!Number.isNaN(chunkCount) && chunkCount > 0) {
+            let combinedValue = '';
+            for (let index = 0; index < chunkCount; index++) {
+                const chunk = getRawCookie(`${name}_${index}`);
+                if (chunk == null) {
+                    return null;
+                }
+                combinedValue += chunk;
+            }
+
             try {
-                return decodeURIComponent(cookie.substring(nameEQ.length));
+                return decodeURIComponent(combinedValue);
             } catch (e) {
-                console.error(`Failed to decode cookie "${name}": ${e.message}`);
+                console.error(`Failed to decode chunked cookie "${name}": ${e.message}`);
                 return null;
             }
         }
     }
-    return null;
+
+    try {
+        const rawValue = getRawCookie(name);
+        return rawValue == null ? null : decodeURIComponent(rawValue);
+    } catch (e) {
+        console.error(`Failed to decode cookie "${name}": ${e.message}`);
+        return null;
+    }
 }
 
 export function deleteCookie(name) {
-    document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;Secure;SameSite=Strict";
+    expireCookie(name);
+    deleteChunkedCookies(name);
 }
 
 export function checkCookieNotificationShown() {
@@ -596,5 +669,5 @@ export function checkCookieNotificationShown() {
 
 export function setCookieNotificationShown() {
     // Set cookie notification flag to persist for the session/browser
-    document.cookie = 'diagramer_cookie_notification_shown=true;path=/;Secure;SameSite=Strict';
+    document.cookie = 'diagramer_cookie_notification_shown=true' + getStorageAttributes();
 }

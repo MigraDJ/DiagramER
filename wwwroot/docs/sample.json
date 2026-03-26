@@ -1,0 +1,215 @@
+{
+  "viewport": {
+    "zoom": 0.7000000000000001,
+    "offset": {
+      "x": -504,
+      "y": 67
+    }
+  },
+  "tables": [
+    {
+      "id": "3b0a286b-5611-40b5-bab1-aa7e471bc589",
+      "name": "Users",
+      "position": {
+        "x": 1540,
+        "y": 400.66666666666663
+      },
+      "size": {
+        "width": 867.2857142857138,
+        "height": 600.4285714285712
+      },
+      "columns": [
+        {
+          "name": "UserID",
+          "dataType": "bigint",
+          "defaultValue": "",
+          "nullable": "No",
+          "primaryKey": "Yes"
+        },
+        {
+          "name": "RoleID",
+          "dataType": "smallint",
+          "defaultValue": "",
+          "nullable": "No",
+          "primaryKey": ""
+        },
+        {
+          "name": "FirstName",
+          "dataType": "varchar",
+          "length": 100,
+          "defaultValue": "",
+          "nullable": "No",
+          "primaryKey": ""
+        },
+        {
+          "name": "LastName",
+          "dataType": "varchar",
+          "length": 100,
+          "defaultValue": "",
+          "nullable": "No",
+          "primaryKey": ""
+        },
+        {
+          "name": "DateOfBirth",
+          "dataType": "date",
+          "defaultValue": "",
+          "nullable": "No",
+          "primaryKey": ""
+        },
+        {
+          "name": "Email",
+          "dataType": "varchar",
+          "length": 50,
+          "defaultValue": "",
+          "nullable": "No",
+          "primaryKey": ""
+        },
+        {
+          "name": "Username",
+          "dataType": "varchar",
+          "length": 50,
+          "defaultValue": "",
+          "nullable": "No",
+          "primaryKey": ""
+        },
+        {
+          "name": "Password",
+          "dataType": "varchar",
+          "length": 50,
+          "defaultValue": "",
+          "nullable": "No",
+          "primaryKey": ""
+        },
+        {
+          "name": "IsActive",
+          "dataType": "bit",
+          "defaultValue": "1",
+          "nullable": "No",
+          "primaryKey": ""
+        },
+        {
+          "name": "RegisteredDate",
+          "dataType": "datetime",
+          "defaultValue": "getdate()",
+          "nullable": "No",
+          "primaryKey": ""
+        },
+        {
+          "name": "LastLogin",
+          "dataType": "datetime",
+          "defaultValue": "",
+          "nullable": "Yes",
+          "primaryKey": ""
+        }
+      ]
+    },
+    {
+      "id": "4e693039-09c4-4d58-bde1-7be0a22815a0",
+      "name": "Posts",
+      "position": {
+        "x": 1488.2380952380959,
+        "y": -57.619047619047564
+      },
+      "size": {
+        "width": 666.4285714285716,
+        "height": 405.14285714285717
+      },
+      "columns": [
+        {
+          "name": "PostID",
+          "dataType": "bigint",
+          "defaultValue": "",
+          "nullable": "No",
+          "primaryKey": "Yes"
+        },
+        {
+          "name": "UserID",
+          "dataType": "bigint",
+          "defaultValue": "",
+          "nullable": "No",
+          "primaryKey": ""
+        },
+        {
+          "name": "Subject",
+          "dataType": "nvarchar",
+          "length": 500,
+          "defaultValue": "",
+          "nullable": "No",
+          "primaryKey": ""
+        },
+        {
+          "name": "PostBody",
+          "dataType": "nvarchar(max)",
+          "defaultValue": "",
+          "nullable": "No",
+          "primaryKey": ""
+        },
+        {
+          "name": "PostDate",
+          "dataType": "datetime",
+          "defaultValue": "getdate()",
+          "nullable": "No",
+          "primaryKey": ""
+        }
+      ]
+    },
+    {
+      "id": "b688e77e-b4a2-49a9-9696-775ecdb5176b",
+      "name": "Roles",
+      "position": {
+        "x": 850.5952380952378,
+        "y": 620.4761904761906
+      },
+      "size": {
+        "width": 620,
+        "height": 300
+      },
+      "columns": [
+        {
+          "name": "RoleID",
+          "dataType": "smallint",
+          "defaultValue": "",
+          "nullable": "No",
+          "primaryKey": "Yes"
+        },
+        {
+          "name": "Name",
+          "dataType": "varchar",
+          "length": 50,
+          "defaultValue": "",
+          "nullable": "No",
+          "primaryKey": ""
+        }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "id": "7da72692-6d63-4a4e-b8d1-fccf0f2edef7",
+      "name": "Users_UserID_Posts_UserID_FK",
+      "hasCustomName": true,
+      "fromTable": "3b0a286b-5611-40b5-bab1-aa7e471bc589",
+      "fromColumn": 0,
+      "toTable": "4e693039-09c4-4d58-bde1-7be0a22815a0",
+      "toColumn": 1,
+      "manualRouteX": 1185.8690476190477
+    },
+    {
+      "id": "2af76911-85b5-464f-a09d-19ba77371851",
+      "name": "Roles_RoleID_Users_RoleID_FK",
+      "fromTable": "b688e77e-b4a2-49a9-9696-775ecdb5176b",
+      "fromColumn": 0,
+      "toTable": "3b0a286b-5611-40b5-bab1-aa7e471bc589",
+      "toColumn": 1,
+      "manualRouteX": 803.3928571428569
+    }
+  ],
+  "labels": [
+    {
+      "id": "6c0fe875-6ea6-4ce5-abb9-face1799783a",
+      "text": "User - Post",
+      "x": 1228.7619047619048,
+      "y": -13.904761904761926
+    }
+  ]
+}

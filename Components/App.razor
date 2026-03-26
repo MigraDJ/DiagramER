@@ -4,12 +4,13 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="DiagramER © by Migra® is a Free web app to design Entity-Relation diagrams and generate SQL scripts out of the diagram." />
+    <meta name="keywords" content="Entity-Relation Diagrams, Free Diagrams, Free ER Diagrams, ER to SQL Sript" />
     <base href="/" />
     <ResourcePreloader />
     <link rel="stylesheet" href="@Assets["lib/bootstrap/dist/css/bootstrap.css"]" />
     <link rel="stylesheet" href="@Assets["app.css"]" />
     <link rel="stylesheet" href="@Assets["DiagramER.styles.css"]" />
-    @* <link rel="stylesheet" href="@Assets["fonts/jost-variablefont_wght.ttf"]" /> *@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
@@ -17,7 +18,6 @@
     <link rel="icon" type="image/png" href="favicon.png" />
     <HeadOutlet @rendermode="InteractiveServer" />
     <script>
-        // Initialize theme before page renders to prevent flash
         (async function() {
             try {
                 const { getTheme, applyTheme } = await import('./js/theme.js');

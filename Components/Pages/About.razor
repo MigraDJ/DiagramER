@@ -2,22 +2,16 @@
 
 <PageTitle>About me</PageTitle>
 <div class="">
-    @* <div class="about-background-glow about-glow-1"></div>
-    <div class="about-background-glow about-glow-2"></div> *@
-
     <div class="about-card">
         <header class="about-hero">
             <div class="avatar-ring">
                 <div class="avatar-placeholder">
-                    @* <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="avatar-icon">
-                        <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5m0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5" />
-                    </svg> *@
                     <img src="img/gab.jpg" width="180" />
                 </div>
             </div>
             <h1>Gabriel Burrola</h1>
             <h4>Migra</h4>
-            <p class="hero-subtitle">.NET Full Stack Developer  •  Trance|EDM Music Producer & DJ </p>
+            <p class="hero-subtitle">.NET Full Stack Developer  •  Trance | EDM Music Producer & DJ </p>
         </header>
 
         <section class="about-section accent-panel">
@@ -39,6 +33,9 @@
                 I've been passionate about Trance & EDM music since late 90s, so I started getting involved into music production and DJing 
                 ever since, you can find some cool stuff on my YouTube channel (link at the bottom of this page).
             </p>
+            <p>
+                I've also had the opportunity to learn and work in graphic design and audio and video post-production.
+            </p>
         </section>
 
         <section class="about-section glass-panel">
@@ -50,7 +47,7 @@
                 <img src="img/diagramerlogo.png" width="150" />
             </div>
             <p>
-                DiagramER is an interactive database diagramming tool built with Blazor and .NET, designed to make schema design feel
+                <a href="/" class="diagramer-link">DiagramER</a> is an interactive database diagramming tool built with Blazor and .NET, designed to make schema design feel
                 visual, flexible, and modern. It allows users to create tables, define columns, configure metadata such as datatype,
                 length, default value, nullability, and primary keys, and then connect related fields through drag-and-drop relations.
             </p>
@@ -212,28 +209,6 @@
             linear-gradient(135deg, var(--bs-body-bg), var(--bs-secondary-bg));
     }
 
-    .about-background-glow {
-        position: absolute;
-        width: 320px;
-        height: 320px;
-        border-radius: 50%;
-        filter: blur(40px);
-        opacity: 0.35;
-        pointer-events: none;
-    }
-
-    .about-glow-1 {
-        top: -80px;
-        left: -60px;
-        background: #0d6efd;
-    }
-
-    .about-glow-2 {
-        right: -80px;
-        bottom: 40px;
-        background: #6f42c1;
-    }
-
     .about-card {
         position: relative;
         z-index: 1;
@@ -259,8 +234,8 @@
         margin: 0 auto 20px;
         padding: 6px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #0d6efd, #6f42c1, #20c997);
-        box-shadow: 0 12px 32px rgba(13, 110, 253, 0.25);
+        background: linear-gradient(135deg, #0090ff, #0090ff, #0090ff);
+        box-shadow: 0 8px 20px rgba(13, 110, 253, 0.25);
     }
 
     .avatar-placeholder {
@@ -421,22 +396,21 @@
     .social-links {
         display: flex;
         justify-content: center;
-        gap: 18px;
+        gap: 10px;
         flex-wrap: wrap;
         padding-top: 8px;
     }
 
     .social-link {
-        width: 58px;
-        height: 58px;
+        width: 30px;
+        height: 30px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        border-radius: 18px;
+        border-radius: 5px;
         color: var(--bs-body-color);
         background: color-mix(in srgb, var(--bs-body-bg) 78%, transparent);
-        border: 1px solid rgba(13, 110, 253, 0.18);
-        box-shadow: 0 12px 26px rgba(0,0,0,0.08);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.08);
         transition: transform 0.2s, box-shadow 0.2s, color 0.2s, border-color 0.2s;
     }
 
@@ -444,12 +418,18 @@
         transform: translateY(-4px) scale(1.04);
         color: #0d6efd;
         border-color: rgba(13, 110, 253, 0.45);
-        box-shadow: 0 16px 30px rgba(13, 110, 253, 0.15);
+        box-shadow: 0 5px 10px rgba(255, 255, 253, 0.15);
     }
 
     .social-link svg {
-        width: 26px;
-        height: 26px;
+        width: 14px;
+        height: 14px;
+    }
+
+    .diagramer-link {
+        color: var(--bs-link-color);
+        text-decoration: none;
+        font-weight: 600;
     }
 
     @@media (max-width: 900px) {

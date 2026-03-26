@@ -6,12 +6,33 @@
 @using Microsoft.AspNetCore.Components.Web
 @inject IJSRuntime JSRuntime
 
+<HeadContent>
+    <meta name="description" content="DiagramER © by Migra® is a Free web app to design Entity-Relation diagrams and generate SQL scripts out of the diagram." />
+    <meta name="keywords" content="Entity-Relation Diagrams, Free Diagrams, Free ER Diagrams, ER to SQL Sript" />
+</HeadContent>
+
 <div class="diagramer-container">
     <!-- Left Panel with Tools -->
     <div class="left-panel">
         <!-- Table Tools Section -->
         <div class="panel-section">
-            <h3>Tables</h3>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="margin: 0;">Tables</h3>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <a href="/docs/sample.json" download title="Sample JSON Diagram" style="color: inherit; text-decoration: none; font-size: 1.2em;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+                            <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5" />
+                            <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z" />
+                        </svg>
+                    </a>
+                    <a href="/docs/Guide.pdf" target="_blank" title="Getting Started Guide" style="color: inherit; text-decoration: none; font-size: 1.2em;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-question-circle" viewBox="0 0 16 16">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                            <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286m1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94" />
+                        </svg>
+                    </a>
+                </div>
+            </div>
             <button class="btn btn-primary btn-block" @onclick="AddTableViaButton">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
                     <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
@@ -134,7 +155,8 @@
             @foreach (var table in Tables)
             {
                 <div class="table-wrapper" 
-                     style="position: absolute; left: @(table.X)px; top: @(table.Y)px; width: @(table.Width)px; height: @(table.Height)px; touch-action: none;">
+                     style="position: absolute; left: @(table.X)px; top: @(table.Y)px; width: @(table.Width)px; height: @(table.Height)px; touch-action: none;"
+                     @onmousedown:stopPropagation="true">
 
                     <!-- Table Card -->
                     <div class="table-card" data-table-id="@table.Id" style="width: 100%; height: 100%; display: flex; flex-direction: column;">
@@ -280,7 +302,7 @@
                         }
 
                         <!-- Resize Handle -->
-                        <div class="resize-handle" @onmousedown="(args) => OnResizeMouseDown(table, args)"></div>
+                        <div class="resize-handle" @onmousedown="(args) => OnResizeMouseDown(table, args)" @onmousedown:stopPropagation="true"></div>
                     </div>
                 </div>
             }
@@ -303,26 +325,48 @@
                 @if (fromTable != null && toTable != null)
                 {
                     var pathPoints = ComputeRelationPath(relation);
-                    @if (pathPoints.Count >= 2)
-                    {
-                        var pointsStr = string.Join(" ", pathPoints.Select(p => FormattableString.Invariant($"{p.X},{p.Y}")));
-                        var relId = relation.Id;
-                        var midSegIdx = pathPoints.Count / 2;
-                        var labelX = (pathPoints[midSegIdx - 1].X + pathPoints[midSegIdx].X) / 2;
-                        var labelY = (pathPoints[midSegIdx - 1].Y + pathPoints[midSegIdx].Y) / 2;
-                        var startPt = pathPoints[0];
-                        var endPt = pathPoints[pathPoints.Count - 1];
+                     @if (pathPoints.Count >= 2)
+                     {
+                         var pointsStr = string.Join(" ", pathPoints.Select(p => FormattableString.Invariant($"{p.X},{p.Y}")));
+                         var relId = relation.Id;
+                         var fromRow = fromTable.Rows.ElementAtOrDefault(relation.FromRowIndex);
+                         var toRow = toTable.Rows.ElementAtOrDefault(relation.ToRowIndex);
+                         var startPt = pathPoints[0];
+                         var endPt = pathPoints[pathPoints.Count - 1];
+                         var oneTooltip = $"One: {fromTable.Name}.{fromRow?.Name}";
+                         var manyTooltip = $"Many: {toTable.Name}.{toRow?.Name}";
+
+                         // Position label above the horizontal segment of the path
+                         double labelX, labelY;
+                         if (pathPoints.Count >= 4)
+                         {
+                             // For 4-point paths, position above the first horizontal segment (between points 0 and 1)
+                             labelX = (pathPoints[0].X + pathPoints[1].X) / 2;
+                             labelY = pathPoints[0].Y - 25; // Above the top horizontal line
+                         }
+                         else
+                         {
+                             // Fallback for other path structures
+                             labelX = (startPt.X + endPt.X) / 2;
+                             labelY = Math.Min(startPt.Y, endPt.Y) - 25;
+                         }
 
                         <polyline points="@pointsStr" class="relation-line-hit"
                                   @onclick="() => SelectRelation(relId)" />
                         <polyline points="@pointsStr"
-                                  class="relation-line @(isSelected ? "relation-line-selected" : "")" />
-                        <circle cx="@startPt.X" cy="@startPt.Y" r="4" class="relation-point" />
-                        <circle cx="@endPt.X" cy="@endPt.Y" r="4" class="relation-point" />
+                                  class="relation-line @(isSelected ? "relation-line-selected" : "")"
+                                  @onmousedown:stopPropagation="true"
+                                  @onmousedown="(e) => OnRelationLineMouseDown(e, relId)" />
+                        <circle cx="@startPt.X" cy="@startPt.Y" r="4" class="relation-point">
+                            <title>@oneTooltip</title>
+                        </circle>
+                        <circle cx="@endPt.X" cy="@endPt.Y" r="4" class="relation-point">
+                            <title>@manyTooltip</title>
+                        </circle>
                         @if (EditingRelationId == relId)
                         {
                             var inputWidth = Math.Max(160, relation.Name.Length * 8 + 20);
-                            <foreignObject x="@(labelX - inputWidth / 2)" y="@(labelY - 24)" width="@inputWidth" height="28">
+                            <foreignObject x="@(labelX - inputWidth / 2)" y="@(labelY - 12)" width="@inputWidth" height="28">
                                 <input type="text" class="relation-name-input"
                                        @bind="relation.Name"
                                        @bind:event="oninput"
@@ -335,26 +379,50 @@
                         {
                             <g @onclick="() => SelectRelation(relId)"
                                @ondblclick="() => StartEditingRelationName(relId)">
-                                <text x="@labelX" y="@(labelY - 8)" class="relation-label @(isSelected ? "relation-label-selected" : "")">@relation.Name</text>
+                                <text x="@labelX" y="@(labelY)" class="relation-label @(isSelected ? "relation-label-selected" : "")">@relation.Name</text>
                             </g>
                         }
                         @if (isSelected)
                         {
                             @if (pathPoints.Count == 4)
                             {
+                                // Waypoint handle on the vertical segment
                                 var wpX = pathPoints[1].X;
                                 var wpY = (pathPoints[1].Y + pathPoints[2].Y) / 2;
                                 <circle cx="@wpX" cy="@wpY" r="6" class="waypoint-handle"
-                                        @onmousedown="(e) => OnWaypointMouseDown(e, relId)" />
+                                        @onmousedown="(e) => OnWaypointMouseDown(e, relId)"
+                                        @onmousedown:stopPropagation="true" />
+
+                                // Additional interactive handles on each segment
+                                <!-- Handle on top horizontal segment -->
+                                <rect x="@(pathPoints[0].X)" y="@(pathPoints[0].Y - 8)" 
+                                      width="@Math.Abs(pathPoints[1].X - pathPoints[0].X)" height="16"
+                                      class="line-segment-handle" opacity="0"
+                                      @onmousedown="(e) => OnRelationLineSegmentMouseDown(e, relId, 0)"
+                                      @onmousedown:stopPropagation="true" />
+
+                                <!-- Handle on vertical segment -->
+                                <rect x="@(pathPoints[1].X - 8)" y="@Math.Min(pathPoints[1].Y, pathPoints[2].Y)" 
+                                      width="16" height="@Math.Abs(pathPoints[2].Y - pathPoints[1].Y)"
+                                      class="line-segment-handle" opacity="0"
+                                      @onmousedown="(e) => OnRelationLineSegmentMouseDown(e, relId, 1)"
+                                      @onmousedown:stopPropagation="true" />
+
+                                <!-- Handle on bottom horizontal segment -->
+                                <rect x="@Math.Min(pathPoints[2].X, pathPoints[3].X)" y="@(pathPoints[2].Y - 8)" 
+                                      width="@Math.Abs(pathPoints[3].X - pathPoints[2].X)" height="16"
+                                      class="line-segment-handle" opacity="0"
+                                      @onmousedown="(e) => OnRelationLineSegmentMouseDown(e, relId, 2)"
+                                      @onmousedown:stopPropagation="true" />
                             }
                             <g class="relation-delete-btn" @onclick="() => RemoveRelation(relId)">
-                                <circle cx="@(labelX + 8)" cy="@(labelY - 22)" r="10" class="relation-delete-circle" />
+                                <circle cx="@(labelX + 60)" cy="@(labelY - 12)" r="10" class="relation-delete-circle" />
                                 <g class="relation-delete-text">
-                                    <text x="@(labelX + 8)" y="@(labelY - 18)">✕</text>
+                                    <text x="@(labelX + 60)" y="@(labelY - 8)">✕</text>
                                 </g>
                             </g>
                         }
-                    }
+                     }
                 }
             }
         </svg>
@@ -507,7 +575,8 @@
     private string? EditingRelationId = null;
     private bool _relationClickedThisFrame = false;
     private string? DraggingWaypointRelationId = null;
-    private double WaypointDragOffsetX = 0;
+    private double WaypointDragStartX = 0;
+    private double WaypointStartRouteX = 0;
     private bool IsPanningCanvas = false;
     private double CanvasZoom = 1;
     private double CanvasOffsetX = 0;
@@ -711,6 +780,7 @@
         {
             CanvasOffsetX = PanStartOffsetX + (args.ClientX - PanStartClientX);
             CanvasOffsetY = PanStartOffsetY + (args.ClientY - PanStartClientY);
+            UpdateJsonOutput();
             StateHasChanged();
             return;
         }
@@ -746,7 +816,7 @@
             var relation = Relations.FirstOrDefault(r => r.Id == DraggingWaypointRelationId);
             if (relation != null)
             {
-                relation.ManualRouteX = diagramX - WaypointDragOffsetX;
+                relation.ManualRouteX = WaypointStartRouteX + (diagramX - WaypointDragStartX);
             }
             StateHasChanged();
         }
@@ -761,11 +831,22 @@
 
     private void OnCanvasMouseUp()
     {
+        var diagramChanged = DraggingTable != null
+            || DraggingTextLabel != null
+            || ResizingTable != null
+            || DraggingWaypointRelationId != null;
+
         DraggingTable = null;
         DraggingTextLabel = null;
         ResizingTable = null;
         DraggingWaypointRelationId = null;
         IsPanningCanvas = false;
+
+        if (diagramChanged)
+        {
+            UpdateJsonOutput();
+        }
+
         if (_relationClickedThisFrame)
         {
             _relationClickedThisFrame = false;
@@ -1007,6 +1088,11 @@
     {
         var schema = new
         {
+            viewport = new
+            {
+                zoom = CanvasZoom,
+                offset = new { x = CanvasOffsetX, y = CanvasOffsetY }
+            },
             tables = Tables.Select(t => new
             {
                 id = t.Id,
@@ -1366,14 +1452,37 @@
             if (path.Count >= 3)
             {
                 var (diagramX, _) = ToDiagramCoordinates(args.ClientX, args.ClientY);
-                WaypointDragOffsetX = diagramX - path[1].X;
+                WaypointDragStartX = diagramX;
+                WaypointStartRouteX = relation.ManualRouteX ?? path[1].X;
             }
             DraggingWaypointRelationId = relationId;
             _relationClickedThisFrame = true;
         }
     }
 
-    private void OnCanvasBackgroundMouseDown(MouseEventArgs args)
+    private void OnRelationLineMouseDown(MouseEventArgs args, string relationId)
+    {
+        SelectRelation(relationId);
+    }
+
+    private void OnRelationLineSegmentMouseDown(MouseEventArgs args, string relationId, int segmentIndex)
+    {
+        var relation = Relations.FirstOrDefault(r => r.Id == relationId);
+        if (relation != null)
+        {
+            var path = ComputeRelationPath(relation);
+            if (path.Count >= 4)
+            {
+                var (diagramX, _) = ToDiagramCoordinates(args.ClientX, args.ClientY);
+                WaypointDragStartX = diagramX;
+                WaypointStartRouteX = relation.ManualRouteX ?? path[1].X;
+                            DraggingWaypointRelationId = relationId;
+                            _relationClickedThisFrame = true;
+                        }
+                    }
+                }
+
+                private void OnCanvasBackgroundMouseDown(MouseEventArgs args)
     {
         if (DraggingTable != null || ResizingTable != null || DraggingWaypointRelationId != null || ShowConfirmDialog)
             return;
@@ -1393,11 +1502,13 @@
     private void ZoomIn()
     {
         CanvasZoom = Math.Min(2.5, CanvasZoom + 0.1);
+        UpdateJsonOutput();
     }
 
     private void ZoomOut()
     {
         CanvasZoom = Math.Max(0.4, CanvasZoom - 0.1);
+        UpdateJsonOutput();
     }
 
     private void ResetViewport()
@@ -1405,6 +1516,7 @@
         CanvasZoom = 1;
         CanvasOffsetX = 0;
         CanvasOffsetY = 0;
+        UpdateJsonOutput();
     }
 
     [JSInvokable]
@@ -1473,11 +1585,10 @@
         try
         {
             var fileName = "diagram.json";
-            var bytes = System.Text.Encoding.UTF8.GetBytes(JsonOutput);
 
             if (jsModule != null)
             {
-                await jsModule.InvokeVoidAsync("downloadFile", bytes, fileName, "application/json");
+                await jsModule.InvokeVoidAsync("downloadFile", JsonOutput, fileName, "application/json");
                 await jsModule.InvokeVoidAsync("showNotification", "JSON file downloaded!");
             }
         }
@@ -1595,6 +1706,27 @@
                 Relations.Clear();
                 TextLabels.Clear();
 
+                if (root.TryGetProperty("viewport", out var viewportElement) && viewportElement.ValueKind == JsonValueKind.Object)
+                {
+                    if (viewportElement.TryGetProperty("zoom", out var zoomElement) && zoomElement.ValueKind == JsonValueKind.Number)
+                        CanvasZoom = Math.Clamp(zoomElement.GetDouble(), 0.4, 2.5);
+
+                    if (viewportElement.TryGetProperty("offset", out var offsetElement) && offsetElement.ValueKind == JsonValueKind.Object)
+                    {
+                        if (offsetElement.TryGetProperty("x", out var offsetXElement) && offsetXElement.ValueKind == JsonValueKind.Number)
+                            CanvasOffsetX = offsetXElement.GetDouble();
+
+                        if (offsetElement.TryGetProperty("y", out var offsetYElement) && offsetYElement.ValueKind == JsonValueKind.Number)
+                            CanvasOffsetY = offsetYElement.GetDouble();
+                    }
+                }
+                else
+                {
+                    CanvasZoom = 1;
+                    CanvasOffsetX = 0;
+                    CanvasOffsetY = 0;
+                }
+
                 // Load tables
                 foreach (var tableElement in tablesElement.EnumerateArray())
                 {
@@ -1651,6 +1783,10 @@
                         }
                     }
 
+                    Console.WriteLine($"Added table: {table.Name} with {table.Rows.Count} columns");
+                    Tables.Add(table);
+                }
+
                 if (root.TryGetProperty("labels", out var labelsElement) && labelsElement.ValueKind == JsonValueKind.Array)
                 {
                     foreach (var labelElement in labelsElement.EnumerateArray())
@@ -1671,10 +1807,6 @@
 
                         TextLabels.Add(label);
                     }
-                }
-
-                    Console.WriteLine($"Added table: {table.Name} with {table.Rows.Count} columns");
-                    Tables.Add(table);
                 }
 
                 // Load relations if they exist
@@ -1732,6 +1864,7 @@
 
                 if (jsModule != null)
                 {
+                    await jsModule.InvokeVoidAsync("setCookie", "diagramer_backup", JsonOutput, 2);
                     await jsModule.InvokeVoidAsync("showNotification", "Diagram loaded successfully!");
                 }
 
@@ -1917,6 +2050,7 @@
         inset: 0;
         width: 100%;
         height: 100%;
+        overflow: visible;
     }
 
     .text-label-wrapper {
@@ -1928,7 +2062,7 @@
 
     .text-label {
         color: var(--bs-body-color);
-        font-size: 18px;
+        font-size: 26px;
         font-weight: 600;
         line-height: 1.3;
         padding: 4px 8px;
@@ -2259,14 +2393,17 @@
         left: 0;
         width: 100%;
         height: 100%;
+        overflow: visible;
         pointer-events: none;
         z-index: 5;
     }
 
     .relations-svg .relation-line-hit,
+    .relations-svg .relation-point,
     .relations-svg .relation-label,
     .relations-svg .relation-delete-btn,
     .relations-svg .waypoint-handle,
+    .relations-svg .line-segment-handle,
     .relations-svg foreignObject {
         pointer-events: all;
     }
@@ -2283,6 +2420,15 @@
         r: 8;
     }
 
+    .line-segment-handle {
+        cursor: ew-resize;
+    }
+
+    .line-segment-handle:hover {
+        opacity: 0.3 !important;
+        fill: #ff9800;
+    }
+
     .relation-line-hit {
         stroke: transparent;
         stroke-width: 14;
@@ -2296,6 +2442,10 @@
         fill: none;
         marker-end: url(#arrowhead);
         pointer-events: none;
+    }
+
+    .relation-point {
+        cursor: help;
     }
 
     .relation-line-selected {
@@ -2368,6 +2518,7 @@
         left: 0;
         width: 100%;
         height: 100%;
+        overflow: visible;
         pointer-events: none;
         z-index: 4;
     }
