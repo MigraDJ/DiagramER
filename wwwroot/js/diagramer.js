@@ -368,14 +368,14 @@ async function ensureExportLibraries(format) {
     await ensureScriptLoaded(
         'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js',
         'html2canvas',
-        'sha384-S2YVLmvOEGmTjV9VH3Z6qJuKvGUqoKVPg8q/FWLZD5GKy7gH3Yc4I/QZY+5i5R1Q'
+        'sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H'
     );
 
     if (format === 'pdf') {
         await ensureScriptLoaded(
             'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js',
             'jspdf',
-            'sha384-1bOUX7/TQHGMc7WfIEaWKq8DlNfC/z3SyC7ZQ38LSVZxvXtl3Q7p3xvkDwrTsAP'
+            'sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk'
         );
     }
 }

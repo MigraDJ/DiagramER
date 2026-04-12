@@ -1,5 +1,4 @@
 using DiagramER.Components;
-using DiagramER.Extensions;
 using DiagramER.Services;
 
 namespace DiagramER
@@ -11,12 +10,14 @@ namespace DiagramER
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services
-            builder.Services
-                .AddRazorComponents()
+            builder.Services.AddResponseCompression();
+            builder.Services.AddHttpContextAccessor();
+            builder.Services.AddHttpClient();
+            builder.Services.AddAntiforgery();
+            builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
 
             builder.Services.AddScoped<ThemeService>();
-            builder.AddCompressionServices();
 
             var app = builder.Build();
 
@@ -25,21 +26,16 @@ namespace DiagramER
             {
                 app.UseExceptionHandler("/Error");
                 app.UseHsts();
-                app.UseResponseCompression();
-            }
-            else
-            {
-                app.UseDevCompressionHandling();
             }
 
-            app.UseSecurityHeaders()
-               .UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true)
-               .UseHttpsRedirection()
-               .UseAntiforgery();
-
+            app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
+            app.UseHttpsRedirection();
+            app.UseResponseCompression();
             app.MapStaticAssets();
+            app.UseAntiforgery();
+
             app.MapRazorComponents<App>()
-               .AddInteractiveServerRenderMode();
+                .AddInteractiveServerRenderMode();
 
             app.Run();
         }
